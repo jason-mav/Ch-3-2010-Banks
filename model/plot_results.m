@@ -1,6 +1,9 @@
 close all;
 clear i j period active_days;
 
+simTime = 100;
+sim('model_Banks',simTime);
+
 case_sel=Case_out.data(1);
 if (case_sel == 4)
     bound = 'bounded';
@@ -51,6 +54,9 @@ title(sprintf('Drug input - Period/Active days: [%d/%d]', period, active_days),'
 set(gca,'FontSize',11)
 xlabel('Days','fontsize',12)
 ylabel('Drug','fontsize',12)
+if (case_sel == 4)
+    ylim([0 1.2])
+end
 
 saveas(fig_drug, strcat(path,'-d'), 'fig');
 print(fig_drug,'-dpng', drug_print_path);
