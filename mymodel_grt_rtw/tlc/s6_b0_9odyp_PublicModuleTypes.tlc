@@ -1,0 +1,33 @@
+%implements s6_b0_9odyp_PublicModuleTypes "C"
+
+%function PublicModuleTypes(block) Output
+
+
+/* Custom Type definition for MATLAB Function: '<Root>/MATLAB Function4' */
+#ifndef struct_tag_spGKsvEVm7uA89hv31XX4LH
+#define struct_tag_spGKsvEVm7uA89hv31XX4LH
+struct tag_spGKsvEVm7uA89hv31XX4LH
+{
+    uint32_T MissingPlacement;
+    uint32_T ComparisonMethod;
+};
+#endif /*struct_tag_spGKsvEVm7uA89hv31XX4LH*/
+#ifndef typedef_spGKsvEVm7uA89hv31XX4LH_mymod_T
+#define typedef_spGKsvEVm7uA89hv31XX4LH_mymod_T
+typedef struct tag_spGKsvEVm7uA89hv31XX4LH spGKsvEVm7uA89hv31XX4LH_mymod_T;
+#endif /*typedef_spGKsvEVm7uA89hv31XX4LH_mymod_T*/
+#ifndef struct_tag_sJCxfmxS8gBOONUZjbjUd9E
+#define struct_tag_sJCxfmxS8gBOONUZjbjUd9E
+struct tag_sJCxfmxS8gBOONUZjbjUd9E
+{
+    boolean_T CaseSensitivity;
+    boolean_T StructExpand;
+    char_T PartialMatching[6];
+    boolean_T IgnoreNulls;
+};
+#endif /*struct_tag_sJCxfmxS8gBOONUZjbjUd9E*/
+#ifndef typedef_sJCxfmxS8gBOONUZjbjUd9E_mymod_T
+#define typedef_sJCxfmxS8gBOONUZjbjUd9E_mymod_T
+typedef struct tag_sJCxfmxS8gBOONUZjbjUd9E sJCxfmxS8gBOONUZjbjUd9E_mymod_T;
+#endif /*typedef_sJCxfmxS8gBOONUZjbjUd9E_mymod_T*/
+%endfunction

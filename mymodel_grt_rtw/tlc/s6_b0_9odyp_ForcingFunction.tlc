@@ -1,0 +1,28 @@
+%implements s6_b0_9odyp_ForcingFunction "C"
+
+%function ForcingFunction(block, system) Output
+%assign cfgTxt = ""
+%openfile cfgTxt
+%assign localVarDecl = ""
+%openfile localVarDecl
+
+XDot_mymodel_T *_rtXdot;
+%closefile localVarDecl
+_rtXdot = %<(SLibCG_SE(SLibGetContStatesDerivativeStructPtr()))>;
+/* ForcingFunction for Integrator: '<Root>/Integrator1' */
+_rtXdot->Integrator1_CSTATE[0] = mymodel_B.x_dot[0];
+_rtXdot->Integrator1_CSTATE[1] = mymodel_B.x_dot[1];
+_rtXdot->Integrator1_CSTATE[2] = mymodel_B.x_dot[2];
+_rtXdot->Integrator1_CSTATE[3] = mymodel_B.x_dot[3];
+%closefile cfgTxt
+%<cfgTxt>
+%<LibSetSystemField(system, "CachedForcingFunctionLocalVars", localVarDecl)>
+%endfunction
+%function ForcingFunctionFcnProtoType(block, system) Output
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void ForcingFunction(\
+%assign comma = ""
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 45, fcnProtoType)>
+%endfunction

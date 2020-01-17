@@ -1,0 +1,29 @@
+%implements s6_b0_9odyp_SystemInitialize "C"
+
+%function SystemInitialize(block, system) Output
+%assign cfgTxt = ""
+%openfile cfgTxt
+%assign localVarDecl = ""
+%<SLibInsertAsyncTaskInitializeCode(system)>
+%<SLibWriteMachineInitialize()>
+/* InitializeConditions for Integrator: '<Root>/Integrator1' */
+if (%<(LibIsFirstInitCond())>) {
+    mymodel_X.Integrator1_CSTATE[0] = 0.0;
+    mymodel_X.Integrator1_CSTATE[1] = 0.0;
+    mymodel_X.Integrator1_CSTATE[2] = 0.0;
+    mymodel_X.Integrator1_CSTATE[3] = 0.0;
+}
+mymodel_DW.Integrator1_IWORK = 1;
+/* End of InitializeConditions for Integrator: '<Root>/Integrator1' */
+%<SLibInsertInitPeriodicCStatesFcn(system)>
+%closefile cfgTxt
+%<cfgTxt>
+%endfunction
+%function SystemInitializeFcnProtoType(block, system) Output
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void SystemInitialize(\
+%assign comma = ""
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 41, fcnProtoType)>
+%endfunction

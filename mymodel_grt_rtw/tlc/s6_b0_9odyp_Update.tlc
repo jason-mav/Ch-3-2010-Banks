@@ -1,0 +1,19 @@
+%implements s6_b0_9odyp_Update "C"
+
+%function Update(block, system) Output
+%assign cfgTxt = ""
+%openfile cfgTxt
+%assign localVarDecl = ""
+/* Update for Integrator: '<Root>/Integrator1' */
+mymodel_DW.Integrator1_IWORK = 0;
+%closefile cfgTxt
+%<cfgTxt>
+%endfunction
+%function UpdateFcnProtoType(block, system) Output
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void Update(\
+%assign comma = ""
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 43, fcnProtoType)>
+%endfunction

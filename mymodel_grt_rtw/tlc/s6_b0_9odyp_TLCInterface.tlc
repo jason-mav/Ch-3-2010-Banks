@@ -1,0 +1,122 @@
+%implements s6_b0_9odyp_TLCInterface "C"
+
+%function getInputAddr_6_27_0_40_0_0(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "&mymodel_B.N"
+%endfunction
+
+%function getInput_6_27_0_40_0_0(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "mymodel_B.N"
+%endfunction
+
+%function getInputAddr_6_27_0_40_0_1(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "&mymodel_B.T"
+%endfunction
+
+%function getInput_6_27_0_40_0_1(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "mymodel_B.T"
+%endfunction
+
+%function getInputAddr_6_27_0_40_0_2(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "&mymodel_B.I"
+%endfunction
+
+%function getInput_6_27_0_40_0_2(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "mymodel_B.I"
+%endfunction
+
+%function getInputAddr_6_27_0_40_0_3(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "&mymodel_B.M"
+%endfunction
+
+%function getInput_6_27_0_40_0_3(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "mymodel_B.M"
+%endfunction
+
+%function getInputAddr_6_27_0_40_1_0(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "&mymodel_B.u"
+%endfunction
+
+%function getInput_6_27_0_40_1_0(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "mymodel_B.u"
+%endfunction
+
+%function getDWorkAddr_6_27_0_40_0_0(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "&mymodel_DW.Scope_PWORK" + SLibCG_ArrayIndexer(ucv, lcv, sigIdx)
+%endfunction
+
+%function getDWork_6_27_0_40_0_0(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "mymodel_DW.Scope_PWORK" + SLibCG_ArrayIndexer(ucv, lcv, sigIdx)
+%endfunction
+
+%function getInputAddr_6_27_0_42_0_0(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "&mymodel_B.N"
+%endfunction
+
+%function getInput_6_27_0_42_0_0(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "mymodel_B.N"
+%endfunction
+
+%function getInputAddr_6_27_0_42_0_1(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "&mymodel_B.T"
+%endfunction
+
+%function getInput_6_27_0_42_0_1(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "mymodel_B.T"
+%endfunction
+
+%function getInputAddr_6_27_0_42_0_2(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "&mymodel_B.I"
+%endfunction
+
+%function getInput_6_27_0_42_0_2(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "mymodel_B.I"
+%endfunction
+
+%function getInputAddr_6_27_0_42_0_3(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "&mymodel_B.M"
+%endfunction
+
+%function getInput_6_27_0_42_0_3(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "mymodel_B.M"
+%endfunction
+
+%function getInputAddr_6_27_0_42_1_0(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "&mymodel_B.u"
+%endfunction
+
+%function getInput_6_27_0_42_1_0(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "mymodel_B.u"
+%endfunction
+
+%function getDWorkAddr_6_27_0_42_0_0(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "&mymodel_DW.Scope_PWORK" + SLibCG_ArrayIndexer(ucv, lcv, sigIdx)
+%endfunction
+
+%function getDWork_6_27_0_42_0_0(opaqueBlock, block, lcv, ucv, sigIdx, reim) void
+
+%return "mymodel_DW.Scope_PWORK" + SLibCG_ArrayIndexer(ucv, lcv, sigIdx)
+%endfunction
+

@@ -1,0 +1,4290 @@
+%implements s6_b0_9odyp_Functions "C"
+
+%function rt_hypotd_snf_Fcn0(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+real_T y;
+real_T a;
+a = fabs(u0);
+y = fabs(u1);
+if (a < y) {
+    a /= y;
+    y *= sqrt(a * a + 1.0);
+} else if (a > y) {
+    y /= a;
+    y = sqrt(y * y + 1.0) * a;
+} else {
+    if (!rtIsNaN(y)) {
+        y = a * 1.4142135623730951;
+    }
+}
+return y;
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+extern real_T rt_hypotd_snf(\
+%assign comma = ""
+%<comma>real_T u0\
+%assign comma = ", "
+%<comma>real_T u1\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 0, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xzlangeM_Fcn1(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+real_T y;
+real_T absxk;
+int32_T k;
+boolean_T exitg1;
+%assign _modelSS = ""
+
+%if SLibCG_FcnCallArgAccessed(0,1,0,0)
+%<SLibCG_AccessArg(0 ,1, 0)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,1,0,1)
+%<SLibCG_AccessArg(0 ,1, 0)>
+%endif
+
+y = 0.0;
+k = 0;
+exitg1 = false;
+while ((!exitg1) && (k < 64)) {
+    absxk = %<(SLibCGCallSubFcn("rt_hypotd_snf", ["x[k].re", "x[k].im"], 0, 1, 0))>;
+    if (rtIsNaN(absxk)) {
+        y = %<LibGetMathConstant(LibRealNonFinite("nan"), FcnGetDataTypeIdFromName("double"))>;
+        exitg1 = true;
+    } else {
+        if (absxk > y) {
+            y = absxk;
+        }
+        k++;
+    }
+}
+return y;
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static real_T mymodel_xzlangeM(\
+%assign comma = ""
+%if SLibCG_ArgAccessed(0, 1, 0)
+%<comma>const creal_T x[64]\
+%assign comma = ", "
+%endif
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 1, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_isfinite_Fcn2(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+return (!rtIsInf(x)) && (!rtIsNaN(x));
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static boolean_T mymodel_isfinite(\
+%assign comma = ""
+%<comma>real_T x\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 2, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xzlascl_Fcn3(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+real_T cfromc;
+real_T ctoc;
+boolean_T notdone;
+real_T cfrom1;
+real_T cto1;
+real_T mul;
+int32_T i;
+cfromc = cfrom;
+ctoc = cto;
+notdone = true;
+while (notdone) {
+    cfrom1 = cfromc * 2.0041683600089728E-292;
+    cto1 = ctoc / 4.9896007738368E+291;
+    if ((fabs(cfrom1) > fabs(ctoc)) && (ctoc != 0.0)) {
+        mul = 2.0041683600089728E-292;
+        cfromc = cfrom1;
+    } else if (fabs(cto1) > fabs(cfromc)) {
+        mul = 4.9896007738368E+291;
+        ctoc = cto1;
+    } else {
+        mul = ctoc / cfromc;
+        notdone = false;
+    }
+    for (i = 0; i < 64; i++) {
+        A[i].re *= mul;
+        A[i].im *= mul;
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xzlascl(\
+%assign comma = ""
+%<comma>real_T cfrom\
+%assign comma = ", "
+%<comma>real_T cto\
+%assign comma = ", "
+%<comma>creal_T A[64]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 3, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xzggbal_Fcn4(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+int32_T j;
+boolean_T found;
+int32_T ii;
+int32_T nzcount;
+int32_T jj;
+int32_T i;
+real_T atmp_re;
+real_T atmp_im;
+int32_T exitg1;
+int32_T exitg2;
+boolean_T exitg3;
+boolean_T exitg4;
+for (i = 0; i < 8; i++) {
+    rscale[i] = 1;
+}
+*ilo = 1;
+*ihi = 8;
+do {
+    exitg2 = 0;
+    i = 0;
+    j = 0;
+    found = false;
+    ii = *ihi;
+    exitg3 = false;
+    while ((!exitg3) && (ii > 0)) {
+        nzcount = 0;
+        i = ii;
+        j = *ihi;
+        jj = 1;
+        exitg4 = false;
+        while ((!exitg4) && (jj <= *ihi)) {
+            if ((A[(((jj - 1) << 3) + ii) - 1].re != 0.0) || (A[(((jj - 1) << 3) + ii) - 1].im != 0.0) || (ii == jj)) {
+                if (nzcount == 0) {
+                    j = jj;
+                    nzcount = 1;
+                    jj++;
+                } else {
+                    nzcount = 2;
+                    exitg4 = true;
+                }
+            } else {
+                jj++;
+            }
+        }
+        if (nzcount < 2) {
+            found = true;
+            exitg3 = true;
+        } else {
+            ii--;
+        }
+    }
+    if (!found) {
+        exitg2 = 2;
+    } else {
+        if (i != *ihi) {
+            for (ii = 0; ii < 8; ii++) {
+                atmp_re = A[((ii << 3) + i) - 1].re;
+                atmp_im = A[((ii << 3) + i) - 1].im;
+                A[(i + (ii << 3)) - 1] = A[((ii << 3) + *ihi) - 1];
+                A[(*ihi + (ii << 3)) - 1].re = atmp_re;
+                A[(*ihi + (ii << 3)) - 1].im = atmp_im;
+            }
+        }
+        if (j != *ihi) {
+            for (i = 0; i < *ihi; i++) {
+                atmp_re = A[((j - 1) << 3) + i].re;
+                atmp_im = A[((j - 1) << 3) + i].im;
+                A[i + ((j - 1) << 3)] = A[((*ihi - 1) << 3) + i];
+                A[i + ((*ihi - 1) << 3)].re = atmp_re;
+                A[i + ((*ihi - 1) << 3)].im = atmp_im;
+            }
+        }
+        rscale[*ihi - 1] = j;
+        (*ihi)--;
+        if (*ihi == 1) {
+            rscale[0] = 1;
+            exitg2 = 1;
+        }
+    }
+} while (exitg2 == 0);
+if (exitg2 == 1) {
+} else {
+    do {
+        exitg1 = 0;
+        i = 0;
+        j = 0;
+        found = false;
+        ii = *ilo;
+        exitg3 = false;
+        while ((!exitg3) && (ii <= *ihi)) {
+            nzcount = 0;
+            i = *ihi;
+            j = ii;
+            jj = *ilo;
+            exitg4 = false;
+            while ((!exitg4) && (jj <= *ihi)) {
+                if ((A[(((ii - 1) << 3) + jj) - 1].re != 0.0) || (A[(((ii - 1) << 3) + jj) - 1].im != 0.0) || (jj == ii)) {
+                    if (nzcount == 0) {
+                        i = jj;
+                        nzcount = 1;
+                        jj++;
+                    } else {
+                        nzcount = 2;
+                        exitg4 = true;
+                    }
+                } else {
+                    jj++;
+                }
+            }
+            if (nzcount < 2) {
+                found = true;
+                exitg3 = true;
+            } else {
+                ii++;
+            }
+        }
+        if (!found) {
+            exitg1 = 1;
+        } else {
+            if (i != *ilo) {
+                for (ii = *ilo - 1; ii + 1 < 9; ii++) {
+                    atmp_re = A[((ii << 3) + i) - 1].re;
+                    atmp_im = A[((ii << 3) + i) - 1].im;
+                    A[(i + (ii << 3)) - 1] = A[((ii << 3) + *ilo) - 1];
+                    A[(*ilo + (ii << 3)) - 1].re = atmp_re;
+                    A[(*ilo + (ii << 3)) - 1].im = atmp_im;
+                }
+            }
+            if (j != *ilo) {
+                for (i = 0; i < *ihi; i++) {
+                    atmp_re = A[((j - 1) << 3) + i].re;
+                    atmp_im = A[((j - 1) << 3) + i].im;
+                    A[i + ((j - 1) << 3)] = A[((*ilo - 1) << 3) + i];
+                    A[i + ((*ilo - 1) << 3)].re = atmp_re;
+                    A[i + ((*ilo - 1) << 3)].im = atmp_im;
+                }
+            }
+            rscale[*ilo - 1] = j;
+            (*ilo)++;
+            if (*ilo == *ihi) {
+                rscale[*ilo - 1] = *ilo;
+                exitg1 = 1;
+            }
+        }
+    } while (exitg1 == 0);
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xzggbal(\
+%assign comma = ""
+%<comma>creal_T A[64]\
+%assign comma = ", "
+%<comma>int32_T *ilo\
+%assign comma = ", "
+%<comma>int32_T *ihi\
+%assign comma = ", "
+%<comma>int32_T rscale[8]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 4, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xzlartg_Fcn5(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+real_T scale;
+int32_T count;
+int32_T rescaledir;
+real_T g2;
+real_T f2s;
+real_T di;
+real_T fs_re;
+real_T fs_im;
+real_T gs_re;
+real_T gs_im;
+real_T g2_tmp;
+boolean_T guard1 = false;
+%assign _modelSS = ""
+
+%if SLibCG_FcnCallArgAccessed(0,5,4,0)
+%<SLibCG_AccessArg(0 ,5, 1)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,5,4,1)
+%<SLibCG_AccessArg(0 ,5, 1)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,5,2,0)
+%<SLibCG_AccessArg(0 ,5, 0)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,5,2,1)
+%<SLibCG_AccessArg(0 ,5, 0)>
+%endif
+
+di = fabs(f.re);
+scale = di;
+g2_tmp = fabs(f.im);
+if (g2_tmp > di) {
+    scale = g2_tmp;
+}
+g2 = fabs(g.re);
+f2s = fabs(g.im);
+if (f2s > g2) {
+    g2 = f2s;
+}
+if (g2 > scale) {
+    scale = g2;
+}
+fs_re = f.re;
+fs_im = f.im;
+gs_re = g.re;
+gs_im = g.im;
+count = 0;
+rescaledir = 0;
+guard1 = false;
+if (scale >= 7.4428285367870146E+137) {
+    do {
+        count++;
+        fs_re *= 1.3435752215134178E-138;
+        fs_im *= 1.3435752215134178E-138;
+        gs_re *= 1.3435752215134178E-138;
+        gs_im *= 1.3435752215134178E-138;
+        scale *= 1.3435752215134178E-138;
+    } while (!(scale < 7.4428285367870146E+137));
+    rescaledir = 1;
+    guard1 = true;
+} else if (scale <= 1.3435752215134178E-138) {
+    if ((g.re == 0.0) && (g.im == 0.0)) {
+        *cs = 1.0;
+        sn->re = 0.0;
+        sn->im = 0.0;
+        *r = f;
+    } else {
+        do {
+            count++;
+            fs_re *= 7.4428285367870146E+137;
+            fs_im *= 7.4428285367870146E+137;
+            gs_re *= 7.4428285367870146E+137;
+            gs_im *= 7.4428285367870146E+137;
+            scale *= 7.4428285367870146E+137;
+        } while (!(scale > 1.3435752215134178E-138));
+        rescaledir = -1;
+        guard1 = true;
+    }
+} else {
+    guard1 = true;
+}
+if (guard1) {
+    scale = fs_re * fs_re + fs_im * fs_im;
+    g2 = gs_re * gs_re + gs_im * gs_im;
+    f2s = g2;
+    if (1.0 > g2) {
+        f2s = 1.0;
+    }
+    if (scale <= f2s * 2.0041683600089728E-292) {
+        if ((f.re == 0.0) && (f.im == 0.0)) {
+            *cs = 0.0;
+            r->re = %<(SLibCGCallSubFcn("rt_hypotd_snf", ["g.re", "g.im"], 0, 5, 4))>;
+            r->im = 0.0;
+            g2 = %<(SLibCGCallSubFcn("rt_hypotd_snf", ["gs_re", "gs_im"], 0, 5, 3))>;
+            sn->re = gs_re / g2;
+            sn->im = -gs_im / g2;
+        } else {
+            scale = sqrt(g2);
+            *cs = %<(SLibCGCallSubFcn("rt_hypotd_snf", ["fs_re", "fs_im"], 0, 5, 0))> / scale;
+            g2 = di;
+            if (g2_tmp > di) {
+                g2 = g2_tmp;
+            }
+            if (g2 > 1.0) {
+                g2 = %<(SLibCGCallSubFcn("rt_hypotd_snf", ["f.re", "f.im"], 0, 5, 2))>;
+                fs_re = f.re / g2;
+                fs_im = f.im / g2;
+            } else {
+                f2s = 7.4428285367870146E+137 * f.re;
+                di = 7.4428285367870146E+137 * f.im;
+                g2 = %<(SLibCGCallSubFcn("rt_hypotd_snf", ["f2s", "di"], 0, 5, 1))>;
+                fs_re = f2s / g2;
+                fs_im = di / g2;
+            }
+            gs_re /= scale;
+            gs_im = -gs_im / scale;
+            sn->re = fs_re * gs_re - fs_im * gs_im;
+            sn->im = fs_re * gs_im + fs_im * gs_re;
+            r->re = (sn->re * g.re - sn->im * g.im) + *cs * f.re;
+            r->im = (sn->re * g.im + sn->im * g.re) + *cs * f.im;
+        }
+    } else {
+        f2s = sqrt(g2 / scale + 1.0);
+        r->re = f2s * fs_re;
+        r->im = f2s * fs_im;
+        *cs = 1.0 / f2s;
+        g2 += scale;
+        scale = r->re / g2;
+        g2 = r->im / g2;
+        sn->re = scale * gs_re - g2 * -gs_im;
+        sn->im = scale * -gs_im + g2 * gs_re;
+        if (rescaledir > 0) {
+            while (rescaledir <= count) {
+                r->re *= 7.4428285367870146E+137;
+                r->im *= 7.4428285367870146E+137;
+                rescaledir++;
+            }
+        } else {
+            if (rescaledir < 0) {
+                for (rescaledir = 1; rescaledir <= count; rescaledir++) {
+                    r->re *= 1.3435752215134178E-138;
+                    r->im *= 1.3435752215134178E-138;
+                }
+            }
+        }
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xzlartg(\
+%assign comma = ""
+%<comma>const creal_T f\
+%assign comma = ", "
+%<comma>const creal_T g\
+%assign comma = ", "
+%<comma>real_T *cs\
+%assign comma = ", "
+%<comma>creal_T *sn\
+%assign comma = ", "
+%<comma>creal_T *r\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 5, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xzgghrd_Fcn6(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+int32_T jrow;
+real_T c;
+creal_T s;
+int32_T jcol;
+int8_T I[64];
+int32_T j;
+creal_T stemp;
+real_T A_re;
+real_T Z_re;
+%assign _modelSS = ""
+
+%if SLibCG_FcnCallArgAccessed(0,6,0,0)
+%<SLibCG_AccessArg(0 ,6, 2)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,6,0,1)
+%<SLibCG_AccessArg(0 ,6, 2)>
+%endif
+
+memset(&I[0], 0, sizeof(int8_T) << 6U);
+for (jcol = 0; jcol < 8; jcol++) {
+    I[jcol + (jcol << 3)] = 1;
+}
+for (jcol = 0; jcol < 64; jcol++) {
+    Z[jcol].re = I[jcol];
+    Z[jcol].im = 0.0;
+}
+if (!(ihi < ilo + 2)) {
+    for (jcol = ilo - 1; jcol + 1 < ihi - 1; jcol++) {
+        for (jrow = ihi - 1; jrow + 1 > jcol + 2; jrow--) {
+            %<(SLibCGCallSubFcn("mymodel_xzlartg", ["A[(jrow + (jcol << 3)) - 1]", "A[jrow + (jcol << 3)]", "&c", "&s", "&stemp"], 0, 6, 0))>;
+            A[(jrow + (jcol << 3)) - 1] = stemp;
+            A[jrow + (jcol << 3)].re = 0.0;
+            A[jrow + (jcol << 3)].im = 0.0;
+            for (j = jcol + 1; j < 8; j++) {
+                stemp.re = A[((j << 3) + jrow) - 1].re * c + (A[(j << 3) + jrow].re * s.re - A[(j << 3) + jrow].im * s.im);
+                stemp.im = A[((j << 3) + jrow) - 1].im * c + (A[(j << 3) + jrow].im * s.re + A[(j << 3) + jrow].re * s.im);
+                Z_re = A[((j << 3) + jrow) - 1].im;
+                A_re = A[((j << 3) + jrow) - 1].re;
+                A[jrow + (j << 3)].re = A[(j << 3) + jrow].re * c - (A[((j << 3) + jrow) - 1].re * s.re + A[((j << 3) + jrow) - 1].im * s.im);
+                A[jrow + (j << 3)].im = A[(j << 3) + jrow].im * c - (s.re * Z_re - s.im * A_re);
+                A[(jrow + (j << 3)) - 1] = stemp;
+            }
+            s.re = -s.re;
+            s.im = -s.im;
+            for (j = 0; j < ihi; j++) {
+                stemp.re = (A[((jrow - 1) << 3) + j].re * s.re - A[((jrow - 1) << 3) + j].im * s.im) + A[(jrow << 3) + j].re * c;
+                stemp.im = (A[((jrow - 1) << 3) + j].im * s.re + A[((jrow - 1) << 3) + j].re * s.im) + A[(jrow << 3) + j].im * c;
+                Z_re = A[(jrow << 3) + j].im;
+                A_re = A[(jrow << 3) + j].re;
+                A[j + ((jrow - 1) << 3)].re = A[((jrow - 1) << 3) + j].re * c - (A[(jrow << 3) + j].re * s.re + A[(jrow << 3) + j].im * s.im);
+                A[j + ((jrow - 1) << 3)].im = A[((jrow - 1) << 3) + j].im * c - (s.re * Z_re - s.im * A_re);
+                A[j + (jrow << 3)] = stemp;
+            }
+            for (j = 0; j < 8; j++) {
+                stemp.re = (Z[((jrow - 1) << 3) + j].re * s.re - Z[((jrow - 1) << 3) + j].im * s.im) + Z[(jrow << 3) + j].re * c;
+                stemp.im = (Z[((jrow - 1) << 3) + j].im * s.re + Z[((jrow - 1) << 3) + j].re * s.im) + Z[(jrow << 3) + j].im * c;
+                Z_re = Z[(jrow << 3) + j].re;
+                Z[j + ((jrow - 1) << 3)].re = Z[((jrow - 1) << 3) + j].re * c - (Z[(jrow << 3) + j].re * s.re + Z[(jrow << 3) + j].im * s.im);
+                Z[j + ((jrow - 1) << 3)].im = Z[((jrow - 1) << 3) + j].im * c - (Z[(jrow << 3) + j].im * s.re - s.im * Z_re);
+                Z[j + (jrow << 3)] = stemp;
+            }
+        }
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xzgghrd(\
+%assign comma = ""
+%<comma>int32_T ilo\
+%assign comma = ", "
+%<comma>int32_T ihi\
+%assign comma = ", "
+%<comma>creal_T A[64]\
+%assign comma = ", "
+%<comma>creal_T Z[64]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 6, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xzlanhs_Fcn7(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+real_T f;
+real_T scale;
+real_T sumsq;
+boolean_T firstNonZero;
+real_T reAij;
+real_T imAij;
+real_T temp2;
+int32_T j;
+int32_T b;
+int32_T i;
+f = 0.0;
+if (!(ilo > ihi)) {
+    scale = 0.0;
+    sumsq = 0.0;
+    firstNonZero = true;
+    for (j = ilo; j <= ihi; j++) {
+        b = j + 1;
+        if (ihi < j + 1) {
+            b = ihi;
+        }
+        for (i = ilo; i <= b; i++) {
+            reAij = A[(((j - 1) << 3) + i) - 1].re;
+            imAij = A[(((j - 1) << 3) + i) - 1].im;
+            if (reAij != 0.0) {
+                reAij = fabs(reAij);
+                if (firstNonZero) {
+                    sumsq = 1.0;
+                    scale = reAij;
+                    firstNonZero = false;
+                } else if (scale < reAij) {
+                    temp2 = scale / reAij;
+                    sumsq = sumsq * temp2 * temp2 + 1.0;
+                    scale = reAij;
+                } else {
+                    temp2 = reAij / scale;
+                    sumsq += temp2 * temp2;
+                }
+            }
+            if (imAij != 0.0) {
+                reAij = fabs(imAij);
+                if (firstNonZero) {
+                    sumsq = 1.0;
+                    scale = reAij;
+                    firstNonZero = false;
+                } else if (scale < reAij) {
+                    temp2 = scale / reAij;
+                    sumsq = sumsq * temp2 * temp2 + 1.0;
+                    scale = reAij;
+                } else {
+                    temp2 = reAij / scale;
+                    sumsq += temp2 * temp2;
+                }
+            }
+        }
+    }
+    f = scale * sqrt(sumsq);
+}
+return f;
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static real_T mymodel_xzlanhs(\
+%assign comma = ""
+%<comma>const creal_T A[64]\
+%assign comma = ", "
+%<comma>int32_T ilo\
+%assign comma = ", "
+%<comma>int32_T ihi\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 7, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_sqrt_Fcn8(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+real_T xr;
+real_T absxr;
+xr = x->re;
+if (x->im == 0.0) {
+    if (x->re < 0.0) {
+        absxr = 0.0;
+        xr = sqrt(-x->re);
+    } else {
+        absxr = sqrt(x->re);
+        xr = 0.0;
+    }
+} else if (x->re == 0.0) {
+    if (x->im < 0.0) {
+        absxr = sqrt(-x->im / 2.0);
+        xr = -absxr;
+    } else {
+        absxr = sqrt(x->im / 2.0);
+        xr = absxr;
+    }
+} else if (rtIsNaN(x->re)) {
+    absxr = x->re;
+} else if (rtIsNaN(x->im)) {
+    absxr = x->im;
+    xr = x->im;
+} else if (rtIsInf(x->im)) {
+    absxr = fabs(x->im);
+    xr = x->im;
+} else if (rtIsInf(x->re)) {
+    if (x->re < 0.0) {
+        absxr = 0.0;
+        xr = x->im * -x->re;
+    } else {
+        absxr = x->re;
+        xr = 0.0;
+    }
+} else {
+    absxr = fabs(x->re);
+    xr = fabs(x->im);
+    if ((absxr > 4.4942328371557893E+307) || (xr > 4.4942328371557893E+307)) {
+        absxr *= 0.5;
+        xr = %<(SLibCGCallSubFcn("rt_hypotd_snf", ["absxr", "xr * 0.5"], 0, 8, 1))>;
+        if (xr > absxr) {
+            absxr = sqrt(absxr / xr + 1.0) * sqrt(xr);
+        } else {
+            absxr = sqrt(xr) * 1.4142135623730951;
+        }
+    } else {
+        absxr = sqrt((%<(SLibCGCallSubFcn("rt_hypotd_snf", ["absxr", "xr"], 0, 8, 0))> + absxr) * 0.5);
+    }
+    if (x->re > 0.0) {
+        xr = x->im / absxr * 0.5;
+    } else {
+        if (x->im < 0.0) {
+            xr = -absxr;
+        } else {
+            xr = absxr;
+        }
+        absxr = x->im / xr * 0.5;
+    }
+}
+x->re = absxr;
+x->im = xr;
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_sqrt(\
+%assign comma = ""
+%<comma>creal_T *x\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 8, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xzlartg_e_Fcn9(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+real_T scale;
+real_T g2;
+real_T f2s;
+real_T di;
+real_T fs_re;
+real_T fs_im;
+real_T gs_re;
+real_T gs_im;
+real_T g2_tmp;
+boolean_T guard1 = false;
+%assign _modelSS = ""
+
+%if SLibCG_FcnCallArgAccessed(0,9,2,0)
+%<SLibCG_AccessArg(0 ,9, 0)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,9,2,1)
+%<SLibCG_AccessArg(0 ,9, 0)>
+%endif
+
+di = fabs(f.re);
+scale = di;
+g2_tmp = fabs(f.im);
+if (g2_tmp > di) {
+    scale = g2_tmp;
+}
+g2 = fabs(g.re);
+f2s = fabs(g.im);
+if (f2s > g2) {
+    g2 = f2s;
+}
+if (g2 > scale) {
+    scale = g2;
+}
+fs_re = f.re;
+fs_im = f.im;
+gs_re = g.re;
+gs_im = g.im;
+guard1 = false;
+if (scale >= 7.4428285367870146E+137) {
+    do {
+        fs_re *= 1.3435752215134178E-138;
+        fs_im *= 1.3435752215134178E-138;
+        gs_re *= 1.3435752215134178E-138;
+        gs_im *= 1.3435752215134178E-138;
+        scale *= 1.3435752215134178E-138;
+    } while (!(scale < 7.4428285367870146E+137));
+    guard1 = true;
+} else if (scale <= 1.3435752215134178E-138) {
+    if ((g.re == 0.0) && (g.im == 0.0)) {
+        *cs = 1.0;
+        sn->re = 0.0;
+        sn->im = 0.0;
+    } else {
+        do {
+            fs_re *= 7.4428285367870146E+137;
+            fs_im *= 7.4428285367870146E+137;
+            gs_re *= 7.4428285367870146E+137;
+            gs_im *= 7.4428285367870146E+137;
+            scale *= 7.4428285367870146E+137;
+        } while (!(scale > 1.3435752215134178E-138));
+        guard1 = true;
+    }
+} else {
+    guard1 = true;
+}
+if (guard1) {
+    scale = fs_re * fs_re + fs_im * fs_im;
+    g2 = gs_re * gs_re + gs_im * gs_im;
+    f2s = g2;
+    if (1.0 > g2) {
+        f2s = 1.0;
+    }
+    if (scale <= f2s * 2.0041683600089728E-292) {
+        if ((f.re == 0.0) && (f.im == 0.0)) {
+            *cs = 0.0;
+            g2 = %<(SLibCGCallSubFcn("rt_hypotd_snf", ["gs_re", "gs_im"], 0, 9, 3))>;
+            sn->re = gs_re / g2;
+            sn->im = -gs_im / g2;
+        } else {
+            scale = sqrt(g2);
+            *cs = %<(SLibCGCallSubFcn("rt_hypotd_snf", ["fs_re", "fs_im"], 0, 9, 0))> / scale;
+            g2 = di;
+            if (g2_tmp > di) {
+                g2 = g2_tmp;
+            }
+            if (g2 > 1.0) {
+                g2 = %<(SLibCGCallSubFcn("rt_hypotd_snf", ["f.re", "f.im"], 0, 9, 2))>;
+                fs_re = f.re / g2;
+                fs_im = f.im / g2;
+            } else {
+                f2s = 7.4428285367870146E+137 * f.re;
+                di = 7.4428285367870146E+137 * f.im;
+                g2 = %<(SLibCGCallSubFcn("rt_hypotd_snf", ["f2s", "di"], 0, 9, 1))>;
+                fs_re = f2s / g2;
+                fs_im = di / g2;
+            }
+            gs_re /= scale;
+            gs_im = -gs_im / scale;
+            sn->re = fs_re * gs_re - fs_im * gs_im;
+            sn->im = fs_re * gs_im + fs_im * gs_re;
+        }
+    } else {
+        f2s = sqrt(g2 / scale + 1.0);
+        fs_re *= f2s;
+        fs_im *= f2s;
+        *cs = 1.0 / f2s;
+        g2 += scale;
+        fs_re /= g2;
+        fs_im /= g2;
+        sn->re = fs_re * gs_re - fs_im * -gs_im;
+        sn->im = fs_re * -gs_im + fs_im * gs_re;
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xzlartg_e(\
+%assign comma = ""
+%<comma>const creal_T f\
+%assign comma = ", "
+%<comma>const creal_T g\
+%assign comma = ", "
+%<comma>real_T *cs\
+%assign comma = ", "
+%<comma>creal_T *sn\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 9, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xzhgeqz_Fcn10(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+creal_T ctemp;
+real_T anorm;
+real_T b_atol;
+boolean_T failed;
+int32_T j;
+int32_T ifirst;
+int32_T istart;
+int32_T ilast;
+int32_T ilastm1;
+int32_T iiter;
+boolean_T goto60;
+boolean_T goto70;
+boolean_T goto90;
+int32_T jp1;
+creal_T ad22;
+real_T temp;
+real_T temp2;
+int32_T jiter;
+creal_T stemp;
+int32_T i;
+creal_T anorm_0;
+real_T ar;
+real_T ai;
+real_T t1_re;
+real_T t1_im;
+real_T stemp_im;
+real_T eshift_re;
+real_T eshift_im;
+boolean_T guard1 = false;
+boolean_T guard2 = false;
+boolean_T guard3 = false;
+int32_T exitg1;
+boolean_T exitg2;
+%assign _modelSS = ""
+
+%if SLibCG_FcnCallArgAccessed(0,10,3,0)
+%<SLibCG_AccessArg(0 ,10, 0)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,10,3,1)
+%<SLibCG_AccessArg(0 ,10, 0)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,10,0,0)
+%<SLibCG_AccessArg(0 ,10, 0)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,10,0,1)
+%<SLibCG_AccessArg(0 ,10, 1)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,10,0,2)
+%<SLibCG_AccessArg(0 ,10, 2)>
+%endif
+
+*info = 0;
+for (i = 0; i < 8; i++) {
+    alpha1[i].re = 0.0;
+    alpha1[i].im = 0.0;
+    beta1[i].re = 1.0;
+    beta1[i].im = 0.0;
+}
+eshift_re = 0.0;
+eshift_im = 0.0;
+ctemp.re = 0.0;
+ctemp.im = 0.0;
+anorm = %<(SLibCGCallSubFcn("mymodel_xzlanhs", ["A", "ilo", "ihi"], 0, 10, 0))>;
+temp = 2.2204460492503131E-16 * anorm;
+b_atol = 2.2250738585072014E-308;
+if (temp > 2.2250738585072014E-308) {
+    b_atol = temp;
+}
+temp = 2.2250738585072014E-308;
+if (anorm > 2.2250738585072014E-308) {
+    temp = anorm;
+}
+anorm = 1.0 / temp;
+failed = true;
+for (ilast = ihi; ilast + 1 < 9; ilast++) {
+    alpha1[ilast] = A[(ilast << 3) + ilast];
+}
+guard1 = false;
+guard2 = false;
+if (ihi >= ilo) {
+    ifirst = ilo;
+    istart = ilo;
+    ilast = ihi - 1;
+    ilastm1 = ihi - 2;
+    iiter = 0;
+    goto60 = false;
+    goto70 = false;
+    goto90 = false;
+    jiter = 1;
+    do {
+        exitg1 = 0;
+        if (jiter <= ((ihi - ilo) + 1) * 30) {
+            if (ilast + 1 == ilo) {
+                goto60 = true;
+            } else if (fabs(A[(ilastm1 << 3) + ilast].re) + fabs(A[(ilastm1 << 3) + ilast].im) <= b_atol) {
+                A[ilast + (ilastm1 << 3)].re = 0.0;
+                A[ilast + (ilastm1 << 3)].im = 0.0;
+                goto60 = true;
+            } else {
+                j = ilastm1;
+                guard3 = false;
+                exitg2 = false;
+                while ((!exitg2) && (j + 1 >= ilo)) {
+                    if (j + 1 == ilo) {
+                        guard3 = true;
+                        exitg2 = true;
+                    } else if (fabs(A[((j - 1) << 3) + j].re) + fabs(A[((j - 1) << 3) + j].im) <= b_atol) {
+                        A[j + ((j - 1) << 3)].re = 0.0;
+                        A[j + ((j - 1) << 3)].im = 0.0;
+                        guard3 = true;
+                        exitg2 = true;
+                    } else {
+                        j--;
+                        guard3 = false;
+                    }
+                }
+                if (guard3) {
+                    ifirst = j + 1;
+                    goto70 = true;
+                }
+            }
+            if (!(goto60 || goto70)) {
+                for (i = 0; i < 8; i++) {
+                    alpha1[i].re = %<LibGetMathConstant(LibRealNonFinite("nan"), FcnGetDataTypeIdFromName("double"))>;
+                    alpha1[i].im = 0.0;
+                    beta1[i].re = %<LibGetMathConstant(LibRealNonFinite("nan"), FcnGetDataTypeIdFromName("double"))>;
+                    beta1[i].im = 0.0;
+                }
+                for (i = 0; i < 64; i++) {
+                    Z[i].re = %<LibGetMathConstant(LibRealNonFinite("nan"), FcnGetDataTypeIdFromName("double"))>;
+                    Z[i].im = 0.0;
+                }
+                *info = 1;
+                exitg1 = 1;
+            } else if (goto60) {
+                goto60 = false;
+                alpha1[ilast] = A[(ilast << 3) + ilast];
+                ilast = ilastm1;
+                ilastm1--;
+                if (ilast + 1 < ilo) {
+                    failed = false;
+                    guard2 = true;
+                    exitg1 = 1;
+                } else {
+                    iiter = 0;
+                    eshift_re = 0.0;
+                    eshift_im = 0.0;
+                    jiter++;
+                }
+            } else {
+                if (goto70) {
+                    goto70 = false;
+                    iiter++;
+                    if (iiter - iiter / 10 * 10 != 0) {
+                        ar = A[(ilastm1 << 3) + ilastm1].re * anorm;
+                        ai = A[(ilastm1 << 3) + ilastm1].im * anorm;
+                        if (ai == 0.0) {
+                            stemp.re = ar / 0.35355339059327373;
+                            stemp.im = 0.0;
+                        } else if (ar == 0.0) {
+                            stemp.re = 0.0;
+                            stemp.im = ai / 0.35355339059327373;
+                        } else {
+                            stemp.re = ar / 0.35355339059327373;
+                            stemp.im = ai / 0.35355339059327373;
+                        }
+                        ar = A[(ilast << 3) + ilast].re * anorm;
+                        ai = A[(ilast << 3) + ilast].im * anorm;
+                        if (ai == 0.0) {
+                            ad22.re = ar / 0.35355339059327373;
+                            ad22.im = 0.0;
+                        } else if (ar == 0.0) {
+                            ad22.re = 0.0;
+                            ad22.im = ai / 0.35355339059327373;
+                        } else {
+                            ad22.re = ar / 0.35355339059327373;
+                            ad22.im = ai / 0.35355339059327373;
+                        }
+                        t1_re = (stemp.re + ad22.re) * 0.5;
+                        t1_im = (stemp.im + ad22.im) * 0.5;
+                        ar = A[(ilast << 3) + ilastm1].re * anorm;
+                        ai = A[(ilast << 3) + ilastm1].im * anorm;
+                        if (ai == 0.0) {
+                            temp = ar / 0.35355339059327373;
+                            temp2 = 0.0;
+                        } else if (ar == 0.0) {
+                            temp = 0.0;
+                            temp2 = ai / 0.35355339059327373;
+                        } else {
+                            temp = ar / 0.35355339059327373;
+                            temp2 = ai / 0.35355339059327373;
+                        }
+                        ar = A[(ilastm1 << 3) + ilast].re * anorm;
+                        ai = A[(ilastm1 << 3) + ilast].im * anorm;
+                        if (ai == 0.0) {
+                            ar /= 0.35355339059327373;
+                            ai = 0.0;
+                        } else if (ar == 0.0) {
+                            ar = 0.0;
+                            ai /= 0.35355339059327373;
+                        } else {
+                            ar /= 0.35355339059327373;
+                            ai /= 0.35355339059327373;
+                        }
+                        stemp_im = stemp.re * ad22.im + stemp.im * ad22.re;
+                        stemp.re = ((t1_re * t1_re - t1_im * t1_im) + (temp * ar - temp2 * ai)) - (stemp.re * ad22.re - stemp.im * ad22.im);
+                        stemp.im = ((t1_re * t1_im + t1_im * t1_re) + (temp * ai + temp2 * ar)) - stemp_im;
+                        %<(SLibCGCallSubFcn("mymodel_sqrt", ["&stemp"], 0, 10, 1))>;
+                        if ((t1_re - ad22.re) * stemp.re + (t1_im - ad22.im) * stemp.im <= 0.0) {
+                            stemp.re += t1_re;
+                            stemp.im += t1_im;
+                        } else {
+                            stemp.re = t1_re - stemp.re;
+                            stemp.im = t1_im - stemp.im;
+                        }
+                    } else {
+                        ar = A[(ilastm1 << 3) + ilast].re * anorm;
+                        ai = A[(ilastm1 << 3) + ilast].im * anorm;
+                        if (ai == 0.0) {
+                            temp = ar / 0.35355339059327373;
+                            temp2 = 0.0;
+                        } else if (ar == 0.0) {
+                            temp = 0.0;
+                            temp2 = ai / 0.35355339059327373;
+                        } else {
+                            temp = ar / 0.35355339059327373;
+                            temp2 = ai / 0.35355339059327373;
+                        }
+                        eshift_re += temp;
+                        eshift_im += temp2;
+                        stemp.re = eshift_re;
+                        stemp.im = eshift_im;
+                    }
+                    j = ilastm1;
+                    jp1 = ilastm1 + 1;
+                    exitg2 = false;
+                    while ((!exitg2) && (j + 1 > ifirst)) {
+                        istart = j + 1;
+                        ctemp.re = A[(j << 3) + j].re * anorm - stemp.re * 0.35355339059327373;
+                        ctemp.im = A[(j << 3) + j].im * anorm - stemp.im * 0.35355339059327373;
+                        temp = fabs(ctemp.re) + fabs(ctemp.im);
+                        temp2 = (fabs(A[(j << 3) + jp1].re) + fabs(A[(j << 3) + jp1].im)) * anorm;
+                        t1_re = temp;
+                        if (temp2 > temp) {
+                            t1_re = temp2;
+                        }
+                        if ((t1_re < 1.0) && (t1_re != 0.0)) {
+                            temp /= t1_re;
+                            temp2 /= t1_re;
+                        }
+                        if ((fabs(A[((j - 1) << 3) + j].re) + fabs(A[((j - 1) << 3) + j].im)) * temp2 <= temp * b_atol) {
+                            goto90 = true;
+                            exitg2 = true;
+                        } else {
+                            jp1 = j;
+                            j--;
+                        }
+                    }
+                    if (!goto90) {
+                        istart = ifirst;
+                        ctemp.re = A[(((ifirst - 1) << 3) + ifirst) - 1].re * anorm - stemp.re * 0.35355339059327373;
+                        ctemp.im = A[(((ifirst - 1) << 3) + ifirst) - 1].im * anorm - stemp.im * 0.35355339059327373;
+                        goto90 = true;
+                    }
+                }
+                if (goto90) {
+                    goto90 = false;
+                    anorm_0.re = A[((istart - 1) << 3) + istart].re * anorm;
+                    anorm_0.im = A[((istart - 1) << 3) + istart].im * anorm;
+                    %<(SLibCGCallSubFcn("mymodel_xzlartg_e", ["ctemp", "anorm_0", "&temp", "&ad22"], 0, 10, 2))>;
+                    j = istart;
+                    jp1 = istart - 2;
+                    while (j < ilast + 1) {
+                        if (j > istart) {
+                            %<(SLibCGCallSubFcn("mymodel_xzlartg", ["A[(j + (jp1 << 3)) - 1]", "A[j + (jp1 << 3)]", "&temp", "&ad22", "&stemp"], 0, 10, 3))>;
+                            A[(j + (jp1 << 3)) - 1] = stemp;
+                            A[j + (jp1 << 3)].re = 0.0;
+                            A[j + (jp1 << 3)].im = 0.0;
+                        }
+                        for (jp1 = j - 1; jp1 < 8; jp1++) {
+                            stemp.re = A[((jp1 << 3) + j) - 1].re * temp + (A[(jp1 << 3) + j].re * ad22.re - A[(jp1 << 3) + j].im * ad22.im);
+                            stemp.im = A[((jp1 << 3) + j) - 1].im * temp + (A[(jp1 << 3) + j].im * ad22.re + A[(jp1 << 3) + j].re * ad22.im);
+                            temp2 = A[((jp1 << 3) + j) - 1].im;
+                            t1_re = A[((jp1 << 3) + j) - 1].re;
+                            A[j + (jp1 << 3)].re = A[(jp1 << 3) + j].re * temp - (A[((jp1 << 3) + j) - 1].re * ad22.re + A[((jp1 << 3) + j) - 1].im * ad22.im);
+                            A[j + (jp1 << 3)].im = A[(jp1 << 3) + j].im * temp - (ad22.re * temp2 - ad22.im * t1_re);
+                            A[(j + (jp1 << 3)) - 1] = stemp;
+                        }
+                        ad22.re = -ad22.re;
+                        ad22.im = -ad22.im;
+                        jp1 = j;
+                        if (ilast + 1 < j + 2) {
+                            jp1 = ilast - 1;
+                        }
+                        for (i = 0; i < jp1 + 2; i++) {
+                            stemp.re = (A[((j - 1) << 3) + i].re * ad22.re - A[((j - 1) << 3) + i].im * ad22.im) + A[(j << 3) + i].re * temp;
+                            stemp.im = (A[((j - 1) << 3) + i].im * ad22.re + A[((j - 1) << 3) + i].re * ad22.im) + A[(j << 3) + i].im * temp;
+                            temp2 = A[(j << 3) + i].im;
+                            t1_re = A[(j << 3) + i].re;
+                            A[i + ((j - 1) << 3)].re = A[((j - 1) << 3) + i].re * temp - (A[(j << 3) + i].re * ad22.re + A[(j << 3) + i].im * ad22.im);
+                            A[i + ((j - 1) << 3)].im = A[((j - 1) << 3) + i].im * temp - (ad22.re * temp2 - ad22.im * t1_re);
+                            A[i + (j << 3)] = stemp;
+                        }
+                        for (jp1 = 0; jp1 < 8; jp1++) {
+                            stemp.re = (Z[((j - 1) << 3) + jp1].re * ad22.re - Z[((j - 1) << 3) + jp1].im * ad22.im) + Z[(j << 3) + jp1].re * temp;
+                            stemp.im = (Z[((j - 1) << 3) + jp1].im * ad22.re + Z[((j - 1) << 3) + jp1].re * ad22.im) + Z[(j << 3) + jp1].im * temp;
+                            temp2 = Z[(j << 3) + jp1].im;
+                            t1_re = Z[(j << 3) + jp1].re;
+                            Z[jp1 + ((j - 1) << 3)].re = Z[((j - 1) << 3) + jp1].re * temp - (Z[(j << 3) + jp1].re * ad22.re + Z[(j << 3) + jp1].im * ad22.im);
+                            Z[jp1 + ((j - 1) << 3)].im = Z[((j - 1) << 3) + jp1].im * temp - (ad22.re * temp2 - ad22.im * t1_re);
+                            Z[jp1 + (j << 3)] = stemp;
+                        }
+                        jp1 = j - 1;
+                        j++;
+                    }
+                }
+                jiter++;
+            }
+        } else {
+            guard2 = true;
+            exitg1 = 1;
+        }
+    } while (exitg1 == 0);
+} else {
+    guard1 = true;
+}
+if (guard2) {
+    if (failed) {
+        *info = ilast + 1;
+        for (ifirst = 0; ifirst < ilast + 1; ifirst++) {
+            alpha1[ifirst].re = %<LibGetMathConstant(LibRealNonFinite("nan"), FcnGetDataTypeIdFromName("double"))>;
+            alpha1[ifirst].im = 0.0;
+            beta1[ifirst].re = %<LibGetMathConstant(LibRealNonFinite("nan"), FcnGetDataTypeIdFromName("double"))>;
+            beta1[ifirst].im = 0.0;
+        }
+        for (i = 0; i < 64; i++) {
+            Z[i].re = %<LibGetMathConstant(LibRealNonFinite("nan"), FcnGetDataTypeIdFromName("double"))>;
+            Z[i].im = 0.0;
+        }
+    } else {
+        guard1 = true;
+    }
+}
+if (guard1) {
+    for (ilast = 0; ilast < ilo - 1; ilast++) {
+        alpha1[ilast] = A[(ilast << 3) + ilast];
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xzhgeqz(\
+%assign comma = ""
+%<comma>creal_T A[64]\
+%assign comma = ", "
+%<comma>int32_T ilo\
+%assign comma = ", "
+%<comma>int32_T ihi\
+%assign comma = ", "
+%<comma>creal_T Z[64]\
+%assign comma = ", "
+%<comma>int32_T *info\
+%assign comma = ", "
+%<comma>creal_T alpha1[8]\
+%assign comma = ", "
+%<comma>creal_T beta1[8]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 10, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xztgevc_Fcn11(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+creal_T work1[8];
+creal_T work2[8];
+real_T rworka[8];
+real_T anorm;
+int32_T j;
+real_T ascale;
+real_T temp;
+real_T acoeff;
+real_T scale;
+real_T dmin;
+boolean_T lscalea;
+boolean_T lscaleb;
+int32_T b_j;
+int32_T i;
+int32_T c_j;
+int32_T c_jr;
+real_T c_y;
+real_T salpha_re;
+real_T salpha_im;
+real_T d_re;
+creal_T work2_0;
+real_T tmp;
+real_T bim;
+real_T temp_tmp;
+memset(&rworka[0], 0, sizeof(real_T) << 3U);
+anorm = fabs(A[0].re) + fabs(A[0].im);
+for (b_j = 0; b_j < 7; b_j++) {
+    for (i = 0; i <= b_j; i++) {
+        rworka[b_j + 1] += fabs(A[((b_j + 1) << 3) + i].re) + fabs(A[((b_j + 1) << 3) + i].im);
+    }
+    ascale = (fabs(A[(((b_j + 1) << 3) + b_j) + 1].re) + fabs(A[(((b_j + 1) << 3) + b_j) + 1].im)) + rworka[b_j + 1];
+    if (ascale > anorm) {
+        anorm = ascale;
+    }
+}
+ascale = anorm;
+if (2.2250738585072014E-308 > anorm) {
+    ascale = 2.2250738585072014E-308;
+}
+ascale = 1.0 / ascale;
+for (b_j = 0; b_j < 8; b_j++) {
+    acoeff = (fabs(A[(((7 - b_j) << 3) - b_j) + 7].re) + fabs(A[(((7 - b_j) << 3) - b_j) + 7].im)) * ascale;
+    if (1.0 > acoeff) {
+        acoeff = 1.0;
+    }
+    temp = 1.0 / acoeff;
+    salpha_re = A[(((7 - b_j) << 3) - b_j) + 7].re * temp * ascale;
+    salpha_im = A[(((7 - b_j) << 3) - b_j) + 7].im * temp * ascale;
+    acoeff = temp * ascale;
+    if ((temp >= 2.2250738585072014E-308) && (fabs(acoeff) < 8.0166734400358911E-292)) {
+        lscalea = true;
+    } else {
+        lscalea = false;
+    }
+    if ((fabs(salpha_re) + fabs(salpha_im) >= 2.2250738585072014E-308) && (fabs(salpha_re) + fabs(salpha_im) < 8.0166734400358911E-292)) {
+        lscaleb = true;
+    } else {
+        lscaleb = false;
+    }
+    scale = 1.0;
+    if (lscalea) {
+        scale = anorm;
+        if (1.2474001934592E+291 < anorm) {
+            scale = 1.2474001934592E+291;
+        }
+        scale *= 8.0166734400358911E-292 / temp;
+    }
+    if (lscaleb) {
+        dmin = 8.0166734400358911E-292 / (fabs(salpha_re) + fabs(salpha_im));
+        if (dmin > scale) {
+            scale = dmin;
+        }
+    }
+    if (lscalea || lscaleb) {
+        dmin = fabs(acoeff);
+        c_y = fabs(salpha_re) + fabs(salpha_im);
+        if (1.0 > dmin) {
+            dmin = 1.0;
+        }
+        if (c_y > dmin) {
+            dmin = c_y;
+        }
+        dmin = 1.0 / (2.2250738585072014E-308 * dmin);
+        if (dmin < scale) {
+            scale = dmin;
+        }
+        if (lscalea) {
+            acoeff = scale * temp * ascale;
+        } else {
+            acoeff *= scale;
+        }
+        salpha_re *= scale;
+        salpha_im *= scale;
+    }
+    scale = fabs(acoeff);
+    memset(&work1[0], 0, sizeof(creal_T) << 3U);
+    work1[7 - b_j].re = 1.0;
+    work1[7 - b_j].im = 0.0;
+    dmin = 2.2204460492503131E-16 * scale * anorm;
+    temp = (fabs(salpha_re) + fabs(salpha_im)) * 2.2204460492503131E-16;
+    if (temp > dmin) {
+        dmin = temp;
+    }
+    if (2.2250738585072014E-308 > dmin) {
+        dmin = 2.2250738585072014E-308;
+    }
+    for (i = 0; i <= 6 - b_j; i++) {
+        work1[i].re = A[((7 - b_j) << 3) + i].re * acoeff;
+        work1[i].im = A[((7 - b_j) << 3) + i].im * acoeff;
+    }
+    work1[7 - b_j].re = 1.0;
+    work1[7 - b_j].im = 0.0;
+    i = (int32_T)(((-1.0 - ((8.0 + -(real_T)b_j) - 1.0)) + 1.0) / -1.0);
+    for (c_j = 0; c_j < i; c_j++) {
+        j = 6 - (b_j + c_j);
+        d_re = A[(j << 3) + j].re * acoeff - salpha_re;
+        temp = A[(j << 3) + j].im * acoeff - salpha_im;
+        if (fabs(d_re) + fabs(temp) <= dmin) {
+            d_re = dmin;
+            temp = 0.0;
+        }
+        c_y = fabs(d_re);
+        bim = fabs(temp);
+        temp_tmp = c_y + bim;
+        if (temp_tmp < 1.0) {
+            tmp = fabs(work1[j].re) + fabs(work1[j].im);
+            if (tmp >= temp_tmp * 5.6177910464447372E+306) {
+                temp_tmp = 1.0 / tmp;
+                for (c_jr = 0; c_jr <= 7 - b_j; c_jr++) {
+                    work1[c_jr].re *= temp_tmp;
+                    work1[c_jr].im *= temp_tmp;
+                }
+            }
+        }
+        temp_tmp = -work1[j].re;
+        if (temp == 0.0) {
+            if (-work1[j].im == 0.0) {
+                work1[j].re = -work1[j].re / d_re;
+                work1[j].im = 0.0;
+            } else if (-work1[j].re == 0.0) {
+                work1[j].re = 0.0;
+                work1[j].im = -work1[j].im / d_re;
+            } else {
+                work1[j].re = -work1[j].re / d_re;
+                work1[j].im = -work1[j].im / d_re;
+            }
+        } else if (d_re == 0.0) {
+            if (-work1[j].re == 0.0) {
+                work1[j].re = -work1[j].im / temp;
+                work1[j].im = 0.0;
+            } else if (-work1[j].im == 0.0) {
+                work1[j].re = 0.0;
+                work1[j].im = -(temp_tmp / temp);
+            } else {
+                work1[j].re = -work1[j].im / temp;
+                work1[j].im = -(temp_tmp / temp);
+            }
+        } else if (c_y > bim) {
+            c_y = temp / d_re;
+            temp = c_y * temp + d_re;
+            work1[j].re = (c_y * -work1[j].im + -work1[j].re) / temp;
+            work1[j].im = (-work1[j].im - c_y * temp_tmp) / temp;
+        } else if (bim == c_y) {
+            d_re = d_re > 0.0 ? 0.5 : -0.5;
+            temp = temp > 0.0 ? 0.5 : -0.5;
+            work1[j].re = (-work1[j].re * d_re + -work1[j].im * temp) / c_y;
+            work1[j].im = (-work1[j].im * d_re - temp_tmp * temp) / c_y;
+        } else {
+            c_y = d_re / temp;
+            temp += c_y * d_re;
+            work1[j].re = (c_y * -work1[j].re + -work1[j].im) / temp;
+            work1[j].im = (c_y * -work1[j].im - temp_tmp) / temp;
+        }
+        if (j + 1 > 1) {
+            if (fabs(work1[j].re) + fabs(work1[j].im) > 1.0) {
+                temp_tmp = 1.0 / (fabs(work1[j].re) + fabs(work1[j].im));
+                if (scale * rworka[j] >= 5.6177910464447372E+306 * temp_tmp) {
+                    for (c_jr = 0; c_jr <= 7 - b_j; c_jr++) {
+                        work1[c_jr].re *= temp_tmp;
+                        work1[c_jr].im *= temp_tmp;
+                    }
+                }
+            }
+            d_re = acoeff * work1[j].re;
+            temp = acoeff * work1[j].im;
+            for (c_jr = 0; c_jr < j; c_jr++) {
+                work1[c_jr].re += A[(j << 3) + c_jr].re * d_re - A[(j << 3) + c_jr].im * temp;
+                work1[c_jr].im += A[(j << 3) + c_jr].im * d_re + A[(j << 3) + c_jr].re * temp;
+            }
+        }
+    }
+    memset(&work2[0], 0, sizeof(creal_T) << 3U);
+    for (i = 0; i <= 7 - b_j; i++) {
+        for (c_j = 0; c_j < 8; c_j++) {
+            work2_0.re = (V[(i << 3) + c_j].re * work1[i].re - V[(i << 3) + c_j].im * work1[i].im) + work2[c_j].re;
+            work2_0.im = (V[(i << 3) + c_j].re * work1[i].im + V[(i << 3) + c_j].im * work1[i].re) + work2[c_j].im;
+            work2[c_j] = work2_0;
+        }
+    }
+    acoeff = fabs(work2[0].re) + fabs(work2[0].im);
+    for (i = 0; i < 7; i++) {
+        temp = fabs(work2[i + 1].re) + fabs(work2[i + 1].im);
+        if (temp > acoeff) {
+            acoeff = temp;
+        }
+    }
+    if (acoeff > 2.2250738585072014E-308) {
+        temp = 1.0 / acoeff;
+        for (i = 0; i < 8; i++) {
+            V[i + ((7 - b_j) << 3)].re = temp * work2[i].re;
+            V[i + ((7 - b_j) << 3)].im = temp * work2[i].im;
+        }
+    } else {
+        memset(&V[b_j * -8 + 56], 0, sizeof(creal_T) << 3U);
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xztgevc(\
+%assign comma = ""
+%<comma>const creal_T A[64]\
+%assign comma = ", "
+%<comma>creal_T V[64]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 11, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xzggbak_Fcn12(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+int32_T i;
+int32_T k;
+int32_T b_j;
+real_T tmp_re;
+real_T tmp_im;
+if (ilo > 1) {
+    for (i = ilo - 2; i + 1 >= 1; i--) {
+        k = rscale[i] - 1;
+        if (i + 1 != rscale[i]) {
+            for (b_j = 0; b_j < 8; b_j++) {
+                tmp_re = V[(b_j << 3) + i].re;
+                tmp_im = V[(b_j << 3) + i].im;
+                V[i + (b_j << 3)] = V[(b_j << 3) + k];
+                V[k + (b_j << 3)].re = tmp_re;
+                V[k + (b_j << 3)].im = tmp_im;
+            }
+        }
+    }
+}
+if (ihi < 8) {
+    for (i = ihi; i + 1 < 9; i++) {
+        k = rscale[i] - 1;
+        if (i + 1 != rscale[i]) {
+            for (b_j = 0; b_j < 8; b_j++) {
+                tmp_re = V[(b_j << 3) + i].re;
+                tmp_im = V[(b_j << 3) + i].im;
+                V[i + (b_j << 3)] = V[(b_j << 3) + k];
+                V[k + (b_j << 3)].re = tmp_re;
+                V[k + (b_j << 3)].im = tmp_im;
+            }
+        }
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xzggbak(\
+%assign comma = ""
+%<comma>creal_T V[64]\
+%assign comma = ", "
+%<comma>int32_T ilo\
+%assign comma = ", "
+%<comma>int32_T ihi\
+%assign comma = ", "
+%<comma>const int32_T rscale[8]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 12, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xzlascl_i_Fcn13(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+real_T cfromc;
+real_T ctoc;
+boolean_T notdone;
+real_T cfrom1;
+real_T cto1;
+real_T mul;
+int32_T i;
+cfromc = cfrom;
+ctoc = cto;
+notdone = true;
+while (notdone) {
+    cfrom1 = cfromc * 2.0041683600089728E-292;
+    cto1 = ctoc / 4.9896007738368E+291;
+    if ((fabs(cfrom1) > fabs(ctoc)) && (ctoc != 0.0)) {
+        mul = 2.0041683600089728E-292;
+        cfromc = cfrom1;
+    } else if (fabs(cto1) > fabs(cfromc)) {
+        mul = 4.9896007738368E+291;
+        ctoc = cto1;
+    } else {
+        mul = ctoc / cfromc;
+        notdone = false;
+    }
+    for (i = 0; i < 8; i++) {
+        A[i].re *= mul;
+        A[i].im *= mul;
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xzlascl_i(\
+%assign comma = ""
+%<comma>real_T cfrom\
+%assign comma = ", "
+%<comma>real_T cto\
+%assign comma = ", "
+%<comma>creal_T A[8]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 13, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xzggev_Fcn14(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+real_T anrm;
+boolean_T ilascl;
+real_T anrmto;
+real_T vtemp;
+int32_T ihi;
+int32_T rscale[8];
+real_T y;
+int32_T i;
+%assign _modelSS = ""
+
+%if SLibCG_FcnCallArgAccessed(0,14,8,0)
+%<SLibCG_AccessArg(0 ,14, 0)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,14,8,3)
+%<SLibCG_AccessArg(0 ,14, 4)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,14,8,4)
+%<SLibCG_AccessArg(0 ,14, 1)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,14,8,5)
+%<SLibCG_AccessArg(0 ,14, 2)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,14,8,6)
+%<SLibCG_AccessArg(0 ,14, 3)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,14,7,2)
+%<SLibCG_AccessArg(0 ,14, 0)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,14,7,3)
+%<SLibCG_AccessArg(0 ,14, 4)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,14,6,0)
+%<SLibCG_AccessArg(0 ,14, 0)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,14,5,2)
+%<SLibCG_AccessArg(0 ,14, 2)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,14,4,0)
+%<SLibCG_AccessArg(0 ,14, 4)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,14,3,0)
+%<SLibCG_AccessArg(0 ,14, 0)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,14,3,1)
+%<SLibCG_AccessArg(0 ,14, 4)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,14,2,2)
+%<SLibCG_AccessArg(0 ,14, 0)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,14,1,0)
+%<SLibCG_AccessArg(0 ,14, 0)>
+%endif
+
+*info = 0;
+anrm = %<(SLibCGCallSubFcn("mymodel_xzlangeM", ["A"], 0, 14, 1))>;
+if (!%<(SLibCGCallSubFcn("mymodel_isfinite", ["anrm"], 0, 14, 0))>) {
+    for (i = 0; i < 8; i++) {
+        alpha1[i].re = %<LibGetMathConstant(LibRealNonFinite("nan"), FcnGetDataTypeIdFromName("double"))>;
+        alpha1[i].im = 0.0;
+        beta1[i].re = %<LibGetMathConstant(LibRealNonFinite("nan"), FcnGetDataTypeIdFromName("double"))>;
+        beta1[i].im = 0.0;
+    }
+    for (i = 0; i < 64; i++) {
+        V[i].re = %<LibGetMathConstant(LibRealNonFinite("nan"), FcnGetDataTypeIdFromName("double"))>;
+        V[i].im = 0.0;
+    }
+} else {
+    ilascl = false;
+    anrmto = anrm;
+    if ((anrm > 0.0) && (anrm < 6.7178761075670888E-139)) {
+        anrmto = 6.7178761075670888E-139;
+        ilascl = true;
+    } else {
+        if (anrm > 1.4885657073574029E+138) {
+            anrmto = 1.4885657073574029E+138;
+            ilascl = true;
+        }
+    }
+    if (ilascl) {
+        %<(SLibCGCallSubFcn("mymodel_xzlascl", ["anrm", "anrmto", "A"], 0, 14, 2))>;
+    }
+    %<(SLibCGCallSubFcn("mymodel_xzggbal", ["A", "&i", "&ihi", "rscale"], 0, 14, 6))>;
+    %<(SLibCGCallSubFcn("mymodel_xzgghrd", ["i", "ihi", "A", "V"], 0, 14, 7))>;
+    %<(SLibCGCallSubFcn("mymodel_xzhgeqz", ["A", "i", "ihi", "V", "info", "alpha1", "beta1"], 0, 14, 8))>;
+    if (*info == 0) {
+        %<(SLibCGCallSubFcn("mymodel_xztgevc", ["A", "V"], 0, 14, 3))>;
+        %<(SLibCGCallSubFcn("mymodel_xzggbak", ["V", "i", "ihi", "rscale"], 0, 14, 4))>;
+        for (i = 0; i < 8; i++) {
+            vtemp = fabs(V[i << 3].re) + fabs(V[i << 3].im);
+            for (ihi = 0; ihi < 7; ihi++) {
+                y = fabs(V[((i << 3) + ihi) + 1].re) + fabs(V[((i << 3) + ihi) + 1].im);
+                if (y > vtemp) {
+                    vtemp = y;
+                }
+            }
+            if (vtemp >= 6.7178761075670888E-139) {
+                vtemp = 1.0 / vtemp;
+                for (ihi = 0; ihi < 8; ihi++) {
+                    V[ihi + (i << 3)].re *= vtemp;
+                    V[ihi + (i << 3)].im *= vtemp;
+                }
+            }
+        }
+        if (ilascl) {
+            %<(SLibCGCallSubFcn("mymodel_xzlascl_i", ["anrmto", "anrm", "alpha1"], 0, 14, 5))>;
+        }
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xzggev(\
+%assign comma = ""
+%if SLibCG_ArgAccessed(0, 14, 0)
+%<comma>creal_T A[64]\
+%assign comma = ", "
+%endif
+%<comma>int32_T *info\
+%assign comma = ", "
+%<comma>creal_T alpha1[8]\
+%assign comma = ", "
+%<comma>creal_T beta1[8]\
+%assign comma = ", "
+%<comma>creal_T V[64]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 14, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xzgeev_Fcn15(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+real_T colnorm;
+creal_T At[64];
+int32_T coltop;
+real_T scale;
+real_T absxk;
+real_T t;
+int32_T k;
+%assign _modelSS = ""
+
+%if SLibCG_FcnCallArgAccessed(0,15,0,1)
+%<SLibCG_AccessArg(0 ,15, 1)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,15,0,2)
+%<SLibCG_AccessArg(0 ,15, 2)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,15,0,3)
+%<SLibCG_AccessArg(0 ,15, 3)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,15,0,4)
+%<SLibCG_AccessArg(0 ,15, 4)>
+%endif
+
+for (coltop = 0; coltop < 64; coltop++) {
+    At[coltop].re = A[coltop];
+    At[coltop].im = 0.0;
+}
+%<(SLibCGCallSubFcn("mymodel_xzggev", ["At", "info", "alpha1", "beta1", "V"], 0, 15, 0))>;
+for (coltop = 0; coltop <= 57; coltop += 8) {
+    colnorm = 0.0;
+    scale = 3.3121686421112381E-170;
+    for (k = coltop; k < coltop + 8; k++) {
+        absxk = fabs(V[k].re);
+        if (absxk > scale) {
+            t = scale / absxk;
+            colnorm = colnorm * t * t + 1.0;
+            scale = absxk;
+        } else {
+            t = absxk / scale;
+            colnorm += t * t;
+        }
+        absxk = fabs(V[k].im);
+        if (absxk > scale) {
+            t = scale / absxk;
+            colnorm = colnorm * t * t + 1.0;
+            scale = absxk;
+        } else {
+            t = absxk / scale;
+            colnorm += t * t;
+        }
+    }
+    colnorm = scale * sqrt(colnorm);
+    for (k = coltop; k < coltop + 8; k++) {
+        if (V[k].im == 0.0) {
+            V[k].re /= colnorm;
+            V[k].im = 0.0;
+        } else if (V[k].re == 0.0) {
+            V[k].re = 0.0;
+            V[k].im /= colnorm;
+        } else {
+            V[k].re /= colnorm;
+            V[k].im /= colnorm;
+        }
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xzgeev(\
+%assign comma = ""
+%<comma>const real_T A[64]\
+%assign comma = ", "
+%if SLibCG_ArgAccessed(0, 15, 1)
+%<comma>int32_T *info\
+%assign comma = ", "
+%endif
+%if SLibCG_ArgAccessed(0, 15, 2)
+%<comma>creal_T alpha1[8]\
+%assign comma = ", "
+%endif
+%if SLibCG_ArgAccessed(0, 15, 3)
+%<comma>creal_T beta1[8]\
+%assign comma = ", "
+%endif
+%<comma>creal_T V[64]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 15, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_anyNonFinite_Fcn16(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+boolean_T c_p;
+int32_T k;
+c_p = true;
+for (k = 0; k < 64; k++) {
+    if (c_p && ((!rtIsInf(x[k])) && (!rtIsNaN(x[k])))) {
+    } else {
+        c_p = false;
+    }
+}
+return !c_p;
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static boolean_T mymodel_anyNonFinite(\
+%assign comma = ""
+%<comma>const real_T x[64]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 16, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xnrm2_Fcn17(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+real_T y;
+real_T scale;
+int32_T kend;
+real_T absxk;
+real_T t;
+int32_T k;
+y = 0.0;
+if (!(n < 1)) {
+    if (n == 1) {
+        y = fabs(x[ix0 - 1]);
+    } else {
+        scale = 3.3121686421112381E-170;
+        kend = (ix0 + n) - 1;
+        for (k = ix0; k <= kend; k++) {
+            absxk = fabs(x[k - 1]);
+            if (absxk > scale) {
+                t = scale / absxk;
+                y = y * t * t + 1.0;
+                scale = absxk;
+            } else {
+                t = absxk / scale;
+                y += t * t;
+            }
+        }
+        y = scale * sqrt(y);
+    }
+}
+return y;
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static real_T mymodel_xnrm2(\
+%assign comma = ""
+%<comma>int32_T n\
+%assign comma = ", "
+%<comma>const real_T x[64]\
+%assign comma = ", "
+%<comma>int32_T ix0\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 17, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xgemv_Fcn18(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+int32_T ix;
+real_T c;
+int32_T iy;
+int32_T b;
+int32_T iac;
+int32_T d;
+int32_T ia;
+if (!((m == 0) || (n == 0))) {
+    for (iy = 1; iy <= n; iy++) {
+        y[iy - 1] = 0.0;
+    }
+    iy = 0;
+    b = ((n - 1) << 3) + ia0;
+    for (iac = ia0; iac <= b; iac += 8) {
+        ix = ix0;
+        c = 0.0;
+        d = (iac + m) - 1;
+        for (ia = iac; ia <= d; ia++) {
+            c += A[ia - 1] * x[ix - 1];
+            ix++;
+        }
+        y[iy] += c;
+        iy++;
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xgemv(\
+%assign comma = ""
+%<comma>int32_T m\
+%assign comma = ", "
+%<comma>int32_T n\
+%assign comma = ", "
+%<comma>const real_T A[64]\
+%assign comma = ", "
+%<comma>int32_T ia0\
+%assign comma = ", "
+%<comma>const real_T x[64]\
+%assign comma = ", "
+%<comma>int32_T ix0\
+%assign comma = ", "
+%<comma>real_T y[8]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 18, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xgerc_Fcn19(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+int32_T jA;
+int32_T jy;
+real_T temp;
+int32_T ix;
+int32_T j;
+int32_T b;
+int32_T ijA;
+if (!(alpha1 == 0.0)) {
+    jA = ia0 - 1;
+    jy = 0;
+    for (j = 1; j <= n; j++) {
+        if (y[jy] != 0.0) {
+            temp = y[jy] * alpha1;
+            ix = ix0;
+            b = m + jA;
+            for (ijA = jA; ijA < b; ijA++) {
+                A[ijA] += A[ix - 1] * temp;
+                ix++;
+            }
+        }
+        jy++;
+        jA += 8;
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xgerc(\
+%assign comma = ""
+%<comma>int32_T m\
+%assign comma = ", "
+%<comma>int32_T n\
+%assign comma = ", "
+%<comma>real_T alpha1\
+%assign comma = ", "
+%<comma>int32_T ix0\
+%assign comma = ", "
+%<comma>const real_T y[8]\
+%assign comma = ", "
+%<comma>real_T A[64]\
+%assign comma = ", "
+%<comma>int32_T ia0\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 19, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xzlarf_Fcn20(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+int32_T lastv;
+int32_T lastc;
+int32_T coltop;
+int32_T ia;
+int32_T exitg1;
+boolean_T exitg2;
+%assign _modelSS = ""
+
+%if SLibCG_FcnCallArgAccessed(0,20,1,2)
+%<SLibCG_AccessArg(0 ,20, 3)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,20,1,3)
+%<SLibCG_AccessArg(0 ,20, 2)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,20,1,4)
+%<SLibCG_AccessArg(0 ,20, 6)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,20,1,5)
+%<SLibCG_AccessArg(0 ,20, 4)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,20,1,6)
+%<SLibCG_AccessArg(0 ,20, 5)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,20,0,2)
+%<SLibCG_AccessArg(0 ,20, 4)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,20,0,3)
+%<SLibCG_AccessArg(0 ,20, 5)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,20,0,4)
+%<SLibCG_AccessArg(0 ,20, 4)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,20,0,5)
+%<SLibCG_AccessArg(0 ,20, 2)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,20,0,6)
+%<SLibCG_AccessArg(0 ,20, 6)>
+%endif
+
+if (tau != 0.0) {
+    lastv = m;
+    lastc = iv0 + m;
+    while ((lastv > 0) && (C[lastc - 2] == 0.0)) {
+        lastv--;
+        lastc--;
+    }
+    lastc = n;
+    exitg2 = false;
+    while ((!exitg2) && (lastc > 0)) {
+        coltop = ((lastc - 1) << 3) + ic0;
+        ia = coltop;
+        do {
+            exitg1 = 0;
+            if (ia <= (coltop + lastv) - 1) {
+                if (C[ia - 1] != 0.0) {
+                    exitg1 = 1;
+                } else {
+                    ia++;
+                }
+            } else {
+                lastc--;
+                exitg1 = 2;
+            }
+        } while (exitg1 == 0);
+        if (exitg1 == 1) {
+            exitg2 = true;
+        }
+    }
+} else {
+    lastv = 0;
+    lastc = 0;
+}
+if (lastv > 0) {
+    %<(SLibCGCallSubFcn("mymodel_xgemv", ["lastv", "lastc", "C", "ic0", "C", "iv0", "work"], 0, 20, 0))>;
+    %<(SLibCGCallSubFcn("mymodel_xgerc", ["lastv", "lastc", "-tau", "iv0", "work", "C", "ic0"], 0, 20, 1))>;
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xzlarf(\
+%assign comma = ""
+%<comma>int32_T m\
+%assign comma = ", "
+%<comma>int32_T n\
+%assign comma = ", "
+%<comma>int32_T iv0\
+%assign comma = ", "
+%<comma>real_T tau\
+%assign comma = ", "
+%<comma>real_T C[64]\
+%assign comma = ", "
+%<comma>int32_T ic0\
+%assign comma = ", "
+%if SLibCG_ArgAccessed(0, 20, 6)
+%<comma>real_T work[8]\
+%assign comma = ", "
+%endif
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 20, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xgehrd_Fcn21(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+real_T work[8];
+int32_T im1n;
+int32_T in;
+int32_T ia0;
+real_T alpha1;
+int32_T i;
+real_T xnorm;
+int32_T knt;
+int32_T rowleft;
+int32_T ia;
+int32_T iy;
+int32_T g;
+int32_T b_ia;
+int32_T jy;
+real_T temp;
+int32_T b_ix;
+int32_T exitg1;
+boolean_T exitg2;
+%assign _modelSS = ""
+
+%if SLibCG_FcnCallArgAccessed(0,21,3,1)
+%<SLibCG_AccessArg(0 ,21, 0)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,21,2,0)
+%<SLibCG_AccessArg(0 ,21, 0)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,21,1,1)
+%<SLibCG_AccessArg(0 ,21, 0)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,21,0,3)
+%<SLibCG_AccessArg(0 ,21, 1)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,21,0,4)
+%<SLibCG_AccessArg(0 ,21, 0)>
+%endif
+
+memset(&work[0], 0, sizeof(real_T) << 3U);
+for (i = 0; i < 7; i++) {
+    im1n = (i << 3) + 2;
+    in = (i + 1) << 3;
+    ia0 = i + 3;
+    if (!(ia0 < 8)) {
+        ia0 = 8;
+    }
+    ia0 += i << 3;
+    alpha1 = a[((i << 3) + i) + 1];
+    temp = 0.0;
+    xnorm = %<(SLibCGCallSubFcn("mymodel_xnrm2", ["6 - i", "a", "ia0"], 0, 21, 1))>;
+    if (xnorm != 0.0) {
+        xnorm = %<(SLibCGCallSubFcn("rt_hypotd_snf", ["a[((i << 3) + i) + 1]", "xnorm"], 0, 21, 2))>;
+        if (a[((i << 3) + i) + 1] >= 0.0) {
+            xnorm = -xnorm;
+        }
+        if (fabs(xnorm) < 1.0020841800044864E-292) {
+            knt = 0;
+            jy = (ia0 - i) + 5;
+            do {
+                knt++;
+                for (rowleft = ia0; rowleft <= jy; rowleft++) {
+                    a[rowleft - 1] *= 9.9792015476736E+291;
+                }
+                xnorm *= 9.9792015476736E+291;
+                alpha1 *= 9.9792015476736E+291;
+            } while (!(fabs(xnorm) >= 1.0020841800044864E-292));
+            xnorm = %<(SLibCGCallSubFcn("rt_hypotd_snf", ["alpha1", "%<(SLibCGCallSubFcn("mymodel_xnrm2", ["6 - i", "a", "ia0"], 0, 21, 3))>"], 0, 21, 4))>;
+            if (alpha1 >= 0.0) {
+                xnorm = -xnorm;
+            }
+            temp = (xnorm - alpha1) / xnorm;
+            alpha1 = 1.0 / (alpha1 - xnorm);
+            while (ia0 <= jy) {
+                a[ia0 - 1] *= alpha1;
+                ia0++;
+            }
+            for (ia0 = 1; ia0 <= knt; ia0++) {
+                xnorm *= 1.0020841800044864E-292;
+            }
+            alpha1 = xnorm;
+        } else {
+            temp = (xnorm - a[((i << 3) + i) + 1]) / xnorm;
+            alpha1 = 1.0 / (a[((i << 3) + i) + 1] - xnorm);
+            knt = (ia0 - i) + 5;
+            while (ia0 <= knt) {
+                a[ia0 - 1] *= alpha1;
+                ia0++;
+            }
+            alpha1 = xnorm;
+        }
+    }
+    tau[i] = temp;
+    a[(i + (i << 3)) + 1] = 1.0;
+    jy = (i + im1n) - 1;
+    if (tau[i] != 0.0) {
+        knt = 7 - i;
+        ia0 = (jy - i) + 6;
+        while ((knt > 0) && (a[ia0] == 0.0)) {
+            knt--;
+            ia0--;
+        }
+        ia0 = 8;
+        exitg2 = false;
+        while ((!exitg2) && (ia0 > 0)) {
+            rowleft = in + ia0;
+            ia = rowleft;
+            do {
+                exitg1 = 0;
+                if (ia <= ((knt - 1) << 3) + rowleft) {
+                    if (a[ia - 1] != 0.0) {
+                        exitg1 = 1;
+                    } else {
+                        ia += 8;
+                    }
+                } else {
+                    ia0--;
+                    exitg1 = 2;
+                }
+            } while (exitg1 == 0);
+            if (exitg1 == 1) {
+                exitg2 = true;
+            }
+        }
+    } else {
+        knt = 0;
+        ia0 = 0;
+    }
+    if (knt > 0) {
+        if (ia0 != 0) {
+            for (rowleft = 1; rowleft <= ia0; rowleft++) {
+                work[rowleft - 1] = 0.0;
+            }
+            rowleft = jy;
+            ia = (((knt - 1) << 3) + in) + 1;
+            for (b_ix = in + 1; b_ix <= ia; b_ix += 8) {
+                iy = 0;
+                g = (b_ix + ia0) - 1;
+                for (b_ia = b_ix; b_ia <= g; b_ia++) {
+                    work[iy] += a[b_ia - 1] * a[rowleft];
+                    iy++;
+                }
+                rowleft++;
+            }
+        }
+        if (!(-tau[i] == 0.0)) {
+            rowleft = in;
+            for (ia = 1; ia <= knt; ia++) {
+                if (a[jy] != 0.0) {
+                    temp = a[jy] * -tau[i];
+                    b_ix = 0;
+                    iy = ia0 + rowleft;
+                    for (g = rowleft; g < iy; g++) {
+                        a[g] += work[b_ix] * temp;
+                        b_ix++;
+                    }
+                }
+                jy++;
+                rowleft += 8;
+            }
+        }
+    }
+    %<(SLibCGCallSubFcn("mymodel_xzlarf", ["7 - i", "7 - i", "i + im1n", "tau[i]", "a", "(i + in) + 2", "work"], 0, 21, 0))>;
+    a[(i + (i << 3)) + 1] = alpha1;
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xgehrd(\
+%assign comma = ""
+%<comma>real_T a[64]\
+%assign comma = ", "
+%<comma>real_T tau[7]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 21, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xungorghr_Fcn22(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+int32_T nh;
+int32_T ia;
+int32_T f_i;
+int32_T itau;
+real_T work[8];
+int32_T iaii;
+int32_T b;
+int32_T k;
+%assign _modelSS = ""
+
+%if SLibCG_FcnCallArgAccessed(0,22,0,3)
+%<SLibCG_AccessArg(0 ,22, 5)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,22,0,4)
+%<SLibCG_AccessArg(0 ,22, 3)>
+%endif
+
+if (n != 0) {
+    nh = ihi - ilo;
+    for (itau = ihi; itau >= ilo + 1; itau--) {
+        ia = (((itau - 1) << 3) + ia0) - 1;
+        for (f_i = 1; f_i < itau; f_i++) {
+            A[(ia + f_i) - 1] = 0.0;
+        }
+        for (f_i = itau; f_i < ihi; f_i++) {
+            A[ia + f_i] = A[(ia + f_i) - 8];
+        }
+        for (f_i = ihi; f_i < n; f_i++) {
+            A[ia + f_i] = 0.0;
+        }
+    }
+    for (itau = 0; itau < ilo; itau++) {
+        ia = ((itau << 3) + ia0) - 1;
+        for (f_i = 1; f_i <= n; f_i++) {
+            A[(ia + f_i) - 1] = 0.0;
+        }
+        A[ia + itau] = 1.0;
+    }
+    for (itau = ihi; itau < n; itau++) {
+        ia = ((itau << 3) + ia0) - 1;
+        for (f_i = 1; f_i <= n; f_i++) {
+            A[(ia + f_i) - 1] = 0.0;
+        }
+        A[ia + itau] = 1.0;
+    }
+    ia = (ia0 + ilo) + (ilo << 3);
+    if (!(nh < 1)) {
+        for (itau = nh; itau < nh; itau++) {
+            f_i = (itau << 3) + ia;
+            for (iaii = 0; iaii < nh; iaii++) {
+                A[(f_i + iaii) - 1] = 0.0;
+            }
+            A[(f_i + itau) - 1] = 1.0;
+        }
+        itau = ((itau0 + ilo) + nh) - 3;
+        memset(&work[0], 0, sizeof(real_T) << 3U);
+        for (f_i = nh - 1; f_i + 1 >= 1; f_i--) {
+            iaii = ((ia + f_i) + (f_i << 3)) - 1;
+            if (f_i + 1 < nh) {
+                A[iaii] = 1.0;
+                %<(SLibCGCallSubFcn("mymodel_xzlarf", ["nh - f_i", "(nh - f_i) - 1", "iaii + 1", "tau[itau]", "A", "iaii + 9", "work"], 0, 22, 0))>;
+                b = (iaii + nh) - f_i;
+                for (k = iaii + 1; k < b; k++) {
+                    A[k] *= -tau[itau];
+                }
+            }
+            A[iaii] = 1.0 - tau[itau];
+            for (b = 1; b <= f_i; b++) {
+                A[iaii - b] = 0.0;
+            }
+            itau--;
+        }
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xungorghr(\
+%assign comma = ""
+%<comma>int32_T n\
+%assign comma = ", "
+%<comma>int32_T ilo\
+%assign comma = ", "
+%<comma>int32_T ihi\
+%assign comma = ", "
+%<comma>real_T A[64]\
+%assign comma = ", "
+%<comma>int32_T ia0\
+%assign comma = ", "
+%<comma>const real_T tau[7]\
+%assign comma = ", "
+%<comma>int32_T itau0\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 22, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xnrm2_i_Fcn23(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+real_T y;
+real_T scale;
+real_T absxk;
+real_T t;
+int32_T k;
+y = 0.0;
+if (!(n < 1)) {
+    if (n == 1) {
+        y = fabs(x[1]);
+    } else {
+        scale = 3.3121686421112381E-170;
+        for (k = 2; k <= n + 1; k++) {
+            absxk = fabs(x[k - 1]);
+            if (absxk > scale) {
+                t = scale / absxk;
+                y = y * t * t + 1.0;
+                scale = absxk;
+            } else {
+                t = absxk / scale;
+                y += t * t;
+            }
+        }
+        y = scale * sqrt(y);
+    }
+}
+return y;
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static real_T mymodel_xnrm2_i(\
+%assign comma = ""
+%<comma>int32_T n\
+%assign comma = ", "
+%<comma>const real_T x[3]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 23, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xzlarfg_Fcn24(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+real_T tau;
+real_T xnorm;
+int32_T knt;
+int32_T c_k;
+%assign _modelSS = ""
+
+%if SLibCG_FcnCallArgAccessed(0,24,3,0)
+%<SLibCG_AccessArg(0 ,24, 1)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,24,2,0)
+%<SLibCG_AccessArg(0 ,24, 0)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,24,2,1)
+%<SLibCG_AccessArg(0 ,24, 2)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,24,1,0)
+%<SLibCG_AccessArg(0 ,24, 1)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,24,0,0)
+%<SLibCG_AccessArg(0 ,24, 0)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,24,0,1)
+%<SLibCG_AccessArg(0 ,24, 2)>
+%endif
+
+tau = 0.0;
+if (!(n <= 0)) {
+    xnorm = %<(SLibCGCallSubFcn("mymodel_xnrm2_i", ["n - 1", "x"], 0, 24, 0))>;
+    if (xnorm != 0.0) {
+        xnorm = %<(SLibCGCallSubFcn("rt_hypotd_snf", ["*alpha1", "xnorm"], 0, 24, 1))>;
+        if (*alpha1 >= 0.0) {
+            xnorm = -xnorm;
+        }
+        if (fabs(xnorm) < 1.0020841800044864E-292) {
+            knt = 0;
+            do {
+                knt++;
+                for (c_k = 1; c_k < n; c_k++) {
+                    x[c_k] *= 9.9792015476736E+291;
+                }
+                xnorm *= 9.9792015476736E+291;
+                *alpha1 *= 9.9792015476736E+291;
+            } while (!(fabs(xnorm) >= 1.0020841800044864E-292));
+            xnorm = %<(SLibCGCallSubFcn("rt_hypotd_snf", ["*alpha1", "%<(SLibCGCallSubFcn("mymodel_xnrm2_i", ["n - 1", "x"], 0, 24, 2))>"], 0, 24, 3))>;
+            if (*alpha1 >= 0.0) {
+                xnorm = -xnorm;
+            }
+            tau = (xnorm - *alpha1) / xnorm;
+            *alpha1 = 1.0 / (*alpha1 - xnorm);
+            for (c_k = 1; c_k < n; c_k++) {
+                x[c_k] *= *alpha1;
+            }
+            for (c_k = 1; c_k <= knt; c_k++) {
+                xnorm *= 1.0020841800044864E-292;
+            }
+            *alpha1 = xnorm;
+        } else {
+            tau = (xnorm - *alpha1) / xnorm;
+            *alpha1 = 1.0 / (*alpha1 - xnorm);
+            for (knt = 1; knt < n; knt++) {
+                x[knt] *= *alpha1;
+            }
+            *alpha1 = xnorm;
+        }
+    }
+}
+return tau;
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static real_T mymodel_xzlarfg(\
+%assign comma = ""
+%<comma>int32_T n\
+%assign comma = ", "
+%<comma>real_T *alpha1\
+%assign comma = ", "
+%<comma>real_T x[3]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 24, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xdlanv2_Fcn25(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+real_T temp;
+real_T p;
+real_T bcmax;
+real_T bcmis;
+real_T scale;
+real_T z;
+int32_T b_0;
+int32_T c_0;
+%assign _modelSS = ""
+
+%if SLibCG_FcnCallArgAccessed(0,25,1,0)
+%<SLibCG_AccessArg(0 ,25, 2)>
+%endif
+
+if (*c == 0.0) {
+    *cs = 1.0;
+    *sn = 0.0;
+} else if (*b == 0.0) {
+    *cs = 0.0;
+    *sn = 1.0;
+    temp = *d;
+    *d = *a;
+    *a = temp;
+    *b = -*c;
+    *c = 0.0;
+} else {
+    temp = *a - *d;
+    if ((temp == 0.0) && ((*b < 0.0) != (*c < 0.0))) {
+        *cs = 1.0;
+        *sn = 0.0;
+    } else {
+        p = 0.5 * temp;
+        bcmis = fabs(*b);
+        z = fabs(*c);
+        bcmax = fmax(bcmis, z);
+        if (!(*b < 0.0)) {
+            b_0 = 1;
+        } else {
+            b_0 = -1;
+        }
+        if (!(*c < 0.0)) {
+            c_0 = 1;
+        } else {
+            c_0 = -1;
+        }
+        bcmis = fmin(bcmis, z) * (real_T)b_0 * (real_T)c_0;
+        scale = fmax(fabs(p), bcmax);
+        z = p / scale * p + bcmax / scale * bcmis;
+        if (z >= 8.8817841970012523E-16) {
+            if (!(p < 0.0)) {
+                z = sqrt(scale) * sqrt(z);
+            } else {
+                z = -(sqrt(scale) * sqrt(z));
+            }
+            z += p;
+            *a = *d + z;
+            *d -= bcmax / z * bcmis;
+            bcmax = %<(SLibCGCallSubFcn("rt_hypotd_snf", ["*c", "z"], 0, 25, 1))>;
+            *cs = z / bcmax;
+            *sn = *c / bcmax;
+            *b -= *c;
+            *c = 0.0;
+        } else {
+            bcmis = *b + *c;
+            bcmax = %<(SLibCGCallSubFcn("rt_hypotd_snf", ["bcmis", "temp"], 0, 25, 0))>;
+            *cs = sqrt((fabs(bcmis) / bcmax + 1.0) * 0.5);
+            if (!(bcmis < 0.0)) {
+                b_0 = 1;
+            } else {
+                b_0 = -1;
+            }
+            *sn = -(p / (bcmax * *cs)) * (real_T)b_0;
+            temp = *a * *cs + *b * *sn;
+            p = -*a * *sn + *b * *cs;
+            bcmax = *c * *cs + *d * *sn;
+            bcmis = -*c * *sn + *d * *cs;
+            *b = p * *cs + bcmis * *sn;
+            *c = -temp * *sn + bcmax * *cs;
+            temp = ((temp * *cs + bcmax * *sn) + (-p * *sn + bcmis * *cs)) * 0.5;
+            *a = temp;
+            *d = temp;
+            if (*c != 0.0) {
+                if (*b != 0.0) {
+                    if ((*b < 0.0) == (*c < 0.0)) {
+                        z = sqrt(fabs(*b));
+                        bcmis = sqrt(fabs(*c));
+                        p = z * bcmis;
+                        if (*c < 0.0) {
+                            p = -p;
+                        }
+                        bcmax = 1.0 / sqrt(fabs(*b + *c));
+                        *a = temp + p;
+                        *d = temp - p;
+                        *b -= *c;
+                        *c = 0.0;
+                        p = z * bcmax;
+                        bcmax *= bcmis;
+                        temp = *cs * p - *sn * bcmax;
+                        *sn = *cs * bcmax + *sn * p;
+                        *cs = temp;
+                    }
+                } else {
+                    *b = -*c;
+                    *c = 0.0;
+                    temp = *cs;
+                    *cs = -*sn;
+                    *sn = temp;
+                }
+            }
+        }
+    }
+}
+*rt1r = *a;
+*rt2r = *d;
+if (*c == 0.0) {
+    *rt1i = 0.0;
+    *rt2i = 0.0;
+} else {
+    *rt1i = sqrt(fabs(*b)) * sqrt(fabs(*c));
+    *rt2i = -*rt1i;
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xdlanv2(\
+%assign comma = ""
+%<comma>real_T *a\
+%assign comma = ", "
+%<comma>real_T *b\
+%assign comma = ", "
+%<comma>real_T *c\
+%assign comma = ", "
+%<comma>real_T *d\
+%assign comma = ", "
+%<comma>real_T *rt1r\
+%assign comma = ", "
+%<comma>real_T *rt1i\
+%assign comma = ", "
+%<comma>real_T *rt2r\
+%assign comma = ", "
+%<comma>real_T *rt2i\
+%assign comma = ", "
+%<comma>real_T *cs\
+%assign comma = ", "
+%<comma>real_T *sn\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 25, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xrot_Fcn26(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+int32_T ix;
+int32_T iy;
+real_T temp;
+int32_T k;
+if (!(n < 1)) {
+    ix = ix0 - 1;
+    iy = iy0 - 1;
+    for (k = 1; k <= n; k++) {
+        temp = c * x[ix] + s * x[iy];
+        x[iy] = c * x[iy] - s * x[ix];
+        x[ix] = temp;
+        iy += 8;
+        ix += 8;
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xrot(\
+%assign comma = ""
+%<comma>int32_T n\
+%assign comma = ", "
+%<comma>real_T x[64]\
+%assign comma = ", "
+%<comma>int32_T ix0\
+%assign comma = ", "
+%<comma>int32_T iy0\
+%assign comma = ", "
+%<comma>real_T c\
+%assign comma = ", "
+%<comma>real_T s\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 26, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xrot_a_Fcn27(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+int32_T ix;
+int32_T iy;
+real_T temp;
+int32_T k;
+if (!(n < 1)) {
+    ix = ix0 - 1;
+    iy = iy0 - 1;
+    for (k = 1; k <= n; k++) {
+        temp = c * x[ix] + s * x[iy];
+        x[iy] = c * x[iy] - s * x[ix];
+        x[ix] = temp;
+        iy++;
+        ix++;
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xrot_a(\
+%assign comma = ""
+%<comma>int32_T n\
+%assign comma = ", "
+%<comma>real_T x[64]\
+%assign comma = ", "
+%<comma>int32_T ix0\
+%assign comma = ", "
+%<comma>int32_T iy0\
+%assign comma = ", "
+%<comma>real_T c\
+%assign comma = ", "
+%<comma>real_T s\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 27, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xrot_av_Fcn28(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+int32_T ix;
+int32_T iy;
+real_T temp;
+int32_T k;
+ix = ix0 - 1;
+iy = iy0 - 1;
+for (k = 0; k < 8; k++) {
+    temp = c * x[ix] + s * x[iy];
+    x[iy] = c * x[iy] - s * x[ix];
+    x[ix] = temp;
+    iy++;
+    ix++;
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_xrot_av(\
+%assign comma = ""
+%<comma>real_T x[64]\
+%assign comma = ", "
+%<comma>int32_T ix0\
+%assign comma = ", "
+%<comma>int32_T iy0\
+%assign comma = ", "
+%<comma>real_T c\
+%assign comma = ", "
+%<comma>real_T s\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 28, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_eml_dlahqr_Fcn29(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+int32_T info;
+real_T v[3];
+int32_T i;
+int32_T L;
+boolean_T goto150;
+int32_T k;
+real_T tst;
+real_T htmp1;
+real_T ab;
+real_T ba;
+real_T aa;
+real_T h12;
+int32_T m;
+int32_T nr;
+int32_T hoffset;
+real_T cs;
+real_T sn;
+real_T b_v[3];
+int32_T its;
+int32_T b_k;
+int32_T b_j;
+real_T c_y;
+real_T b_y_tmp;
+boolean_T exitg1;
+boolean_T exitg2;
+boolean_T exitg3;
+%assign _modelSS = ""
+
+%if SLibCG_FcnCallArgAccessed(0,29,4,0)
+%<SLibCG_AccessArg(0 ,29, 1)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,29,3,1)
+%<SLibCG_AccessArg(0 ,29, 0)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,29,2,1)
+%<SLibCG_AccessArg(0 ,29, 0)>
+%endif
+
+info = 0;
+v[0] = 0.0;
+v[1] = 0.0;
+v[2] = 0.0;
+for (i = 0; i < 5; i++) {
+    h[(i + (i << 3)) + 2] = 0.0;
+    h[(i + (i << 3)) + 3] = 0.0;
+}
+h[47] = 0.0;
+i = 7;
+exitg1 = false;
+while ((!exitg1) && (i + 1 >= 1)) {
+    L = 1;
+    goto150 = false;
+    its = 0;
+    exitg2 = false;
+    while ((!exitg2) && (its < 301)) {
+        k = i;
+        exitg3 = false;
+        while ((!exitg3) && ((k + 1 > L) && (!(fabs(h[((k - 1) << 3) + k]) <= 8.0166734400358911E-292)))) {
+            tst = fabs(h[(((k - 1) << 3) + k) - 1]) + fabs(h[(k << 3) + k]);
+            if (tst == 0.0) {
+                if (k - 1 >= 1) {
+                    tst = fabs(h[(((k - 2) << 3) + k) - 1]);
+                }
+                if (k + 2 <= 8) {
+                    tst += fabs(h[((k << 3) + k) + 1]);
+                }
+            }
+            if (fabs(h[((k - 1) << 3) + k]) <= 2.2204460492503131E-16 * tst) {
+                htmp1 = fabs(h[((k - 1) << 3) + k]);
+                tst = fabs(h[((k << 3) + k) - 1]);
+                if (htmp1 > tst) {
+                    ab = htmp1;
+                    ba = tst;
+                } else {
+                    ab = tst;
+                    ba = htmp1;
+                }
+                htmp1 = fabs(h[(k << 3) + k]);
+                tst = fabs(h[(((k - 1) << 3) + k) - 1] - h[(k << 3) + k]);
+                if (htmp1 > tst) {
+                    aa = htmp1;
+                    htmp1 = tst;
+                } else {
+                    aa = tst;
+                }
+                tst = aa + ab;
+                if (ab / tst * ba <= fmax(8.0166734400358911E-292, aa / tst * htmp1 * 2.2204460492503131E-16)) {
+                    exitg3 = true;
+                } else {
+                    k--;
+                }
+            } else {
+                k--;
+            }
+        }
+        L = k + 1;
+        if (k + 1 > 1) {
+            h[k + ((k - 1) << 3)] = 0.0;
+        }
+        if (k + 1 >= i) {
+            goto150 = true;
+            exitg2 = true;
+        } else {
+            if (its == 10) {
+                tst = fabs(h[(((k + 1) << 3) + k) + 2]) + fabs(h[((k << 3) + k) + 1]);
+                htmp1 = h[(k << 3) + k] + 0.75 * tst;
+                h12 = -0.4375 * tst;
+                aa = tst;
+                ba = htmp1;
+            } else if (its == 20) {
+                tst = fabs(h[(((i - 2) << 3) + i) - 1]) + fabs(h[((i - 1) << 3) + i]);
+                htmp1 = h[(i << 3) + i] + 0.75 * tst;
+                h12 = -0.4375 * tst;
+                aa = tst;
+                ba = htmp1;
+            } else {
+                htmp1 = h[(((i - 1) << 3) + i) - 1];
+                aa = h[((i - 1) << 3) + i];
+                h12 = h[((i << 3) + i) - 1];
+                ba = h[(i << 3) + i];
+            }
+            tst = ((fabs(htmp1) + fabs(h12)) + fabs(aa)) + fabs(ba);
+            if (tst == 0.0) {
+                htmp1 = 0.0;
+                ba = 0.0;
+                ab = 0.0;
+                aa = 0.0;
+            } else {
+                htmp1 /= tst;
+                aa /= tst;
+                h12 /= tst;
+                ba /= tst;
+                ab = (htmp1 + ba) / 2.0;
+                htmp1 = (htmp1 - ab) * (ba - ab) - h12 * aa;
+                aa = sqrt(fabs(htmp1));
+                if (htmp1 >= 0.0) {
+                    htmp1 = ab * tst;
+                    ab = htmp1;
+                    ba = aa * tst;
+                    aa = -ba;
+                } else {
+                    htmp1 = ab + aa;
+                    ab -= aa;
+                    if (fabs(htmp1 - ba) <= fabs(ab - ba)) {
+                        htmp1 *= tst;
+                        ab = htmp1;
+                    } else {
+                        ab *= tst;
+                        htmp1 = ab;
+                    }
+                    ba = 0.0;
+                    aa = 0.0;
+                }
+            }
+            m = i - 1;
+            exitg3 = false;
+            while ((!exitg3) && (m >= k + 1)) {
+                tst = (fabs(h[(((m - 1) << 3) + m) - 1] - ab) + fabs(aa)) + fabs(h[((m - 1) << 3) + m]);
+                h12 = h[((m - 1) << 3) + m] / tst;
+                v[0] = ((h[(((m - 1) << 3) + m) - 1] - ab) / tst * (h[(((m - 1) << 3) + m) - 1] - htmp1) + h[((m << 3) + m) - 1] * h12) - aa / tst * ba;
+                v[1] = (((h[(((m - 1) << 3) + m) - 1] + h[(m << 3) + m]) - htmp1) - ab) * h12;
+                v[2] = h[((m << 3) + m) + 1] * h12;
+                tst = (fabs(v[0]) + fabs(v[1])) + fabs(v[2]);
+                h12 = v[0] / tst;
+                v[0] = h12;
+                b_y_tmp = v[1] / tst;
+                v[1] = b_y_tmp;
+                tst = v[2] / tst;
+                v[2] = tst;
+                if ((k + 1 == m) || (fabs(h[(((m - 2) << 3) + m) - 1]) * (fabs(b_y_tmp) + fabs(tst)) <= ((fabs(h[(((m - 2) << 3) + m) - 2]) + fabs(h[(((m - 1) << 3) + m) - 1])) + fabs(h[(m << 3) + m])) * (2.2204460492503131E-16 * fabs(h12)))) {
+                    exitg3 = true;
+                } else {
+                    m--;
+                }
+            }
+            for (b_k = m; b_k <= i; b_k++) {
+                nr = (i - b_k) + 2;
+                if (3 < nr) {
+                    nr = 3;
+                }
+                if (b_k > m) {
+                    hoffset = ((b_k - 2) << 3) + b_k;
+                    for (b_j = -1; b_j + 2 <= nr; b_j++) {
+                        v[b_j + 1] = h[b_j + hoffset];
+                    }
+                }
+                htmp1 = v[0];
+                b_v[0] = v[0];
+                b_v[1] = v[1];
+                b_v[2] = v[2];
+                tst = %<(SLibCGCallSubFcn("mymodel_xzlarfg", ["nr", "&htmp1", "b_v"], 0, 29, 0))>;
+                v[1] = b_v[1];
+                v[2] = b_v[2];
+                v[0] = htmp1;
+                if (b_k > m) {
+                    h[(b_k + ((b_k - 2) << 3)) - 1] = htmp1;
+                    h[b_k + ((b_k - 2) << 3)] = 0.0;
+                    if (b_k < i) {
+                        h[(b_k + ((b_k - 2) << 3)) + 1] = 0.0;
+                    }
+                } else {
+                    if (m > k + 1) {
+                        h[(b_k + ((b_k - 2) << 3)) - 1] *= 1.0 - tst;
+                    }
+                }
+                htmp1 = b_v[1];
+                ab = tst * b_v[1];
+                if (nr == 3) {
+                    aa = b_v[2];
+                    h12 = tst * b_v[2];
+                    for (nr = b_k - 1; nr + 1 < 9; nr++) {
+                        ba = (h[((nr << 3) + b_k) - 1] + h[(nr << 3) + b_k] * htmp1) + h[((nr << 3) + b_k) + 1] * aa;
+                        h[(b_k + (nr << 3)) - 1] -= ba * tst;
+                        h[b_k + (nr << 3)] -= ba * ab;
+                        h[(b_k + (nr << 3)) + 1] -= ba * h12;
+                    }
+                    hoffset = b_k + 3;
+                    nr = i + 1;
+                    if (hoffset < nr) {
+                        nr = hoffset;
+                    }
+                    for (hoffset = 0; hoffset < nr; hoffset++) {
+                        ba = (h[((b_k - 1) << 3) + hoffset] + h[(b_k << 3) + hoffset] * htmp1) + h[((b_k + 1) << 3) + hoffset] * aa;
+                        h[hoffset + ((b_k - 1) << 3)] -= ba * tst;
+                        h[hoffset + (b_k << 3)] -= ba * ab;
+                        h[hoffset + ((b_k + 1) << 3)] -= ba * h12;
+                    }
+                    for (nr = 0; nr < 8; nr++) {
+                        ba = (z[((b_k - 1) << 3) + nr] + z[(b_k << 3) + nr] * htmp1) + z[((b_k + 1) << 3) + nr] * aa;
+                        z[nr + ((b_k - 1) << 3)] -= ba * tst;
+                        z[nr + (b_k << 3)] -= ba * ab;
+                        z[nr + ((b_k + 1) << 3)] -= ba * h12;
+                    }
+                } else {
+                    if (nr == 2) {
+                        for (nr = b_k - 1; nr + 1 < 9; nr++) {
+                            ba = h[((nr << 3) + b_k) - 1] + h[(nr << 3) + b_k] * htmp1;
+                            h[(b_k + (nr << 3)) - 1] -= ba * tst;
+                            h[b_k + (nr << 3)] -= ba * ab;
+                        }
+                        for (nr = 0; nr < i + 1; nr++) {
+                            ba = h[((b_k - 1) << 3) + nr] + h[(b_k << 3) + nr] * htmp1;
+                            h[nr + ((b_k - 1) << 3)] -= ba * tst;
+                            h[nr + (b_k << 3)] -= ba * ab;
+                        }
+                        for (nr = 0; nr < 8; nr++) {
+                            ba = z[((b_k - 1) << 3) + nr] + z[(b_k << 3) + nr] * htmp1;
+                            z[nr + ((b_k - 1) << 3)] -= ba * tst;
+                            z[nr + (b_k << 3)] -= ba * ab;
+                        }
+                    }
+                }
+            }
+            its++;
+        }
+    }
+    if (!goto150) {
+        info = i + 1;
+        exitg1 = true;
+    } else {
+        if (!((i + 1 == L) || (!(L == i)))) {
+            tst = h[(((i - 1) << 3) + i) - 1];
+            htmp1 = h[((i << 3) + i) - 1];
+            ab = h[((i - 1) << 3) + i];
+            ba = h[(i << 3) + i];
+            %<(SLibCGCallSubFcn("mymodel_xdlanv2", ["&tst", "&htmp1", "&ab", "&ba", "&aa", "&h12", "&b_y_tmp", "&c_y", "&cs", "&sn"], 0, 29, 1))>;
+            h[(i + ((i - 1) << 3)) - 1] = tst;
+            h[(i + (i << 3)) - 1] = htmp1;
+            h[i + ((i - 1) << 3)] = ab;
+            h[i + (i << 3)] = ba;
+            if (8 > i + 1) {
+                %<(SLibCGCallSubFcn("mymodel_xrot", ["7 - i", "h", "i + ((i + 1) << 3)", "(i + ((i + 1) << 3)) + 1", "cs", "sn"], 0, 29, 2))>;
+            }
+            %<(SLibCGCallSubFcn("mymodel_xrot_a", ["i - 1", "h", "1 + ((i - 1) << 3)", "1 + (i << 3)", "cs", "sn"], 0, 29, 3))>;
+            %<(SLibCGCallSubFcn("mymodel_xrot_av", ["z", "1 + ((i - 1) << 3)", "1 + (i << 3)", "cs", "sn"], 0, 29, 4))>;
+        }
+        i = L - 2;
+    }
+}
+return info;
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static int32_T mymodel_eml_dlahqr(\
+%assign comma = ""
+%<comma>real_T h[64]\
+%assign comma = ", "
+%<comma>real_T z[64]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 29, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_xhseqr_Fcn30(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+int32_T info;
+int32_T istart;
+int32_T j;
+int32_T i;
+%assign _modelSS = ""
+
+%if SLibCG_FcnCallArgAccessed(0,30,0,0)
+%<SLibCG_AccessArg(0 ,30, 0)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,30,0,1)
+%<SLibCG_AccessArg(0 ,30, 1)>
+%endif
+
+info = %<(SLibCGCallSubFcn("mymodel_eml_dlahqr", ["h", "z"], 0, 30, 0))>;
+istart = 4;
+for (j = 0; j < 5; j++) {
+    for (i = istart; i < 9; i++) {
+        h[(i + (j << 3)) - 1] = 0.0;
+    }
+    istart++;
+}
+return info;
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static int32_T mymodel_xhseqr(\
+%assign comma = ""
+%<comma>real_T h[64]\
+%assign comma = ", "
+%if SLibCG_ArgAccessed(0, 30, 1)
+%<comma>real_T z[64]\
+%assign comma = ", "
+%endif
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 30, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_rsf2csf_Fcn31(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+int32_T m;
+real_T r;
+int32_T j;
+real_T rt1r;
+real_T rt2r;
+real_T rt2i;
+real_T cs;
+real_T sn;
+real_T mu1_re;
+real_T mu1_im;
+real_T t1_re;
+real_T t1_im;
+%assign _modelSS = ""
+
+%if SLibCG_FcnCallArgAccessed(0,31,2,1)
+%<SLibCG_AccessArg(0 ,31, 1)>
+%endif
+
+for (m = 0; m < 64; m++) {
+    T[m].re = Tr[m];
+    T[m].im = 0.0;
+    U[m].re = Ur[m];
+    U[m].im = 0.0;
+}
+for (m = 6; m >= 0; m--) {
+    if (Tr[((m << 3) + m) + 1] != 0.0) {
+        r = Tr[(m << 3) + m];
+        mu1_re = Tr[((m + 1) << 3) + m];
+        t1_re = Tr[((m << 3) + m) + 1];
+        t1_im = Tr[(((m + 1) << 3) + m) + 1];
+        %<(SLibCGCallSubFcn("mymodel_xdlanv2", ["&r", "&mu1_re", "&t1_re", "&t1_im", "&rt1r", "&mu1_im", "&rt2r", "&rt2i", "&cs", "&sn"], 0, 31, 0))>;
+        mu1_re = rt1r - Tr[(((m + 1) << 3) + m) + 1];
+        r = %<(SLibCGCallSubFcn("rt_hypotd_snf", ["%<(SLibCGCallSubFcn("rt_hypotd_snf", ["mu1_re", "mu1_im"], 0, 31, 1))>", "Tr[((m << 3) + m) + 1]"], 0, 31, 2))>;
+        if (mu1_im == 0.0) {
+            mu1_re /= r;
+            mu1_im = 0.0;
+        } else if (mu1_re == 0.0) {
+            mu1_re = 0.0;
+            mu1_im /= r;
+        } else {
+            mu1_re /= r;
+            mu1_im /= r;
+        }
+        r = Tr[((m << 3) + m) + 1] / r;
+        for (j = m; j + 1 < 9; j++) {
+            t1_re = T[(j << 3) + m].re;
+            t1_im = T[(j << 3) + m].im;
+            rt1r = T[(j << 3) + m].re;
+            T[m + (j << 3)].re = (T[(j << 3) + m].re * mu1_re + T[(j << 3) + m].im * mu1_im) + T[((j << 3) + m) + 1].re * r;
+            T[m + (j << 3)].im = (T[(j << 3) + m].im * mu1_re - mu1_im * rt1r) + T[((j << 3) + m) + 1].im * r;
+            rt1r = T[((j << 3) + m) + 1].im * mu1_re + T[((j << 3) + m) + 1].re * mu1_im;
+            T[(m + (j << 3)) + 1].re = (T[((j << 3) + m) + 1].re * mu1_re - T[((j << 3) + m) + 1].im * mu1_im) - r * t1_re;
+            T[(m + (j << 3)) + 1].im = rt1r - r * t1_im;
+        }
+        for (j = 0; j < m + 2; j++) {
+            t1_re = T[(m << 3) + j].re;
+            t1_im = T[(m << 3) + j].im;
+            rt1r = T[(m << 3) + j].im * mu1_re + T[(m << 3) + j].re * mu1_im;
+            T[j + (m << 3)].re = (T[(m << 3) + j].re * mu1_re - T[(m << 3) + j].im * mu1_im) + T[((m + 1) << 3) + j].re * r;
+            T[j + (m << 3)].im = T[((m + 1) << 3) + j].im * r + rt1r;
+            rt1r = T[((m + 1) << 3) + j].re;
+            T[j + ((m + 1) << 3)].re = (T[((m + 1) << 3) + j].re * mu1_re + T[((m + 1) << 3) + j].im * mu1_im) - r * t1_re;
+            T[j + ((m + 1) << 3)].im = (T[((m + 1) << 3) + j].im * mu1_re - mu1_im * rt1r) - r * t1_im;
+        }
+        for (j = 0; j < 8; j++) {
+            t1_re = U[(m << 3) + j].re;
+            t1_im = U[(m << 3) + j].im;
+            rt1r = U[(m << 3) + j].im * mu1_re + U[(m << 3) + j].re * mu1_im;
+            U[j + (m << 3)].re = (U[(m << 3) + j].re * mu1_re - U[(m << 3) + j].im * mu1_im) + U[((m + 1) << 3) + j].re * r;
+            U[j + (m << 3)].im = U[((m + 1) << 3) + j].im * r + rt1r;
+            rt1r = U[((m + 1) << 3) + j].re;
+            U[j + ((m + 1) << 3)].re = (U[((m + 1) << 3) + j].re * mu1_re + U[((m + 1) << 3) + j].im * mu1_im) - r * t1_re;
+            U[j + ((m + 1) << 3)].im = (U[((m + 1) << 3) + j].im * mu1_re - mu1_im * rt1r) - r * t1_im;
+        }
+        T[(m + (m << 3)) + 1].re = 0.0;
+        T[(m + (m << 3)) + 1].im = 0.0;
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_rsf2csf(\
+%assign comma = ""
+%<comma>const real_T Ur[64]\
+%assign comma = ", "
+%<comma>const real_T Tr[64]\
+%assign comma = ", "
+%<comma>creal_T U[64]\
+%assign comma = ", "
+%<comma>creal_T T[64]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 31, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_triu_Fcn32(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+int32_T istart;
+int32_T j;
+int32_T i;
+istart = 3;
+for (j = 0; j < 6; j++) {
+    for (i = istart; i < 9; i++) {
+        x[(i + (j << 3)) - 1].re = 0.0;
+        x[(i + (j << 3)) - 1].im = 0.0;
+    }
+    istart++;
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_triu(\
+%assign comma = ""
+%<comma>creal_T x[64]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 32, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_schur_Fcn33(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+real_T b_A[64];
+real_T tau[7];
+real_T Vr[64];
+int32_T i;
+%assign _modelSS = ""
+
+%if SLibCG_FcnCallArgAccessed(0,33,5,0)
+%<SLibCG_AccessArg(0 ,33, 1)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,33,4,2)
+%<SLibCG_AccessArg(0 ,33, 1)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,33,4,3)
+%<SLibCG_AccessArg(0 ,33, 2)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,33,0,0)
+%<SLibCG_AccessArg(0 ,33, 0)>
+%endif
+
+if (%<(SLibCGCallSubFcn("mymodel_anyNonFinite", ["A"], 0, 33, 0))>) {
+    for (i = 0; i < 64; i++) {
+        V[i].re = %<LibGetMathConstant(LibRealNonFinite("nan"), FcnGetDataTypeIdFromName("double"))>;
+        V[i].im = 0.0;
+    }
+    %<(SLibCGCallSubFcn("mymodel_triu", ["V"], 0, 33, 5))>;
+    for (i = 0; i < 64; i++) {
+        T[i].re = %<LibGetMathConstant(LibRealNonFinite("nan"), FcnGetDataTypeIdFromName("double"))>;
+        T[i].im = 0.0;
+    }
+} else {
+    memcpy(&b_A[0], &A[0], sizeof(real_T) << 6U);
+    %<(SLibCGCallSubFcn("mymodel_xgehrd", ["b_A", "tau"], 0, 33, 1))>;
+    memcpy(&Vr[0], &b_A[0], sizeof(real_T) << 6U);
+    %<(SLibCGCallSubFcn("mymodel_xungorghr", ["8", "1", "8", "Vr", "1", "tau", "1"], 0, 33, 2))>;
+    %<(SLibCGCallSubFcn("mymodel_xhseqr", ["b_A", "Vr"], 0, 33, 3))>;
+    %<(SLibCGCallSubFcn("mymodel_rsf2csf", ["Vr", "b_A", "V", "T"], 0, 33, 4))>;
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_schur(\
+%assign comma = ""
+%<comma>const real_T A[64]\
+%assign comma = ", "
+%<comma>creal_T V[64]\
+%assign comma = ", "
+%<comma>creal_T T[64]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 33, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_eig_Fcn34(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+creal_T alpha1[8];
+creal_T beta1[8];
+boolean_T b_p;
+int32_T k;
+int32_T i;
+real_T brm;
+real_T bim;
+real_T sgnbi;
+int32_T exitg1;
+boolean_T exitg2;
+%assign _modelSS = ""
+
+%if SLibCG_FcnCallArgAccessed(0,34,1,0)
+%<SLibCG_AccessArg(0 ,34, 0)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,34,1,1)
+%<SLibCG_AccessArg(0 ,34, 1)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,34,1,2)
+%<SLibCG_AccessArg(0 ,34, 2)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,34,0,0)
+%<SLibCG_AccessArg(0 ,34, 0)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,34,0,4)
+%<SLibCG_AccessArg(0 ,34, 1)>
+%endif
+
+b_p = true;
+for (k = 0; k < 64; k++) {
+    if (b_p && ((!rtIsInf(A[k])) && (!rtIsNaN(A[k])))) {
+    } else {
+        b_p = false;
+    }
+}
+if (!b_p) {
+    for (k = 0; k < 64; k++) {
+        V[k].re = %<LibGetMathConstant(LibRealNonFinite("nan"), FcnGetDataTypeIdFromName("double"))>;
+        V[k].im = 0.0;
+        D[k].re = 0.0;
+        D[k].im = 0.0;
+    }
+    for (k = 0; k < 8; k++) {
+        D[k + (k << 3)].re = %<LibGetMathConstant(LibRealNonFinite("nan"), FcnGetDataTypeIdFromName("double"))>;
+        D[k + (k << 3)].im = 0.0;
+    }
+} else {
+    k = 0;
+    exitg2 = false;
+    while ((!exitg2) && (k < 8)) {
+        i = 0;
+        do {
+            exitg1 = 0;
+            if (i <= k) {
+                if (!(A[(k << 3) + i] == A[(i << 3) + k])) {
+                    b_p = false;
+                    exitg1 = 1;
+                } else {
+                    i++;
+                }
+            } else {
+                k++;
+                exitg1 = 2;
+            }
+        } while (exitg1 == 0);
+        if (exitg1 == 1) {
+            exitg2 = true;
+        }
+    }
+    if (b_p) {
+        %<(SLibCGCallSubFcn("mymodel_schur", ["A", "V", "D"], 0, 34, 1))>;
+        D[0].im = 0.0;
+        for (k = 0; k < 7; k++) {
+            D[(k + ((k + 1) << 3)) + 1].im = 0.0;
+            D[(k + (k << 3)) + 1].re = 0.0;
+            D[(k + (k << 3)) + 1].im = 0.0;
+            for (i = 1; i <= k + 1; i++) {
+                D[(i + ((k + 1) << 3)) - 1].re = 0.0;
+                D[(i + ((k + 1) << 3)) - 1].im = 0.0;
+            }
+        }
+    } else {
+        %<(SLibCGCallSubFcn("mymodel_xzgeev", ["A", "&k", "alpha1", "beta1", "V"], 0, 34, 0))>;
+        memset(&D[0], 0, sizeof(creal_T) << 6U);
+        for (k = 0; k < 8; k++) {
+            if (beta1[k].im == 0.0) {
+                if (alpha1[k].im == 0.0) {
+                    D[k + (k << 3)].re = alpha1[k].re / beta1[k].re;
+                    D[k + (k << 3)].im = 0.0;
+                } else if (alpha1[k].re == 0.0) {
+                    D[k + (k << 3)].re = 0.0;
+                    D[k + (k << 3)].im = alpha1[k].im / beta1[k].re;
+                } else {
+                    D[k + (k << 3)].re = alpha1[k].re / beta1[k].re;
+                    D[k + (k << 3)].im = alpha1[k].im / beta1[k].re;
+                }
+            } else if (beta1[k].re == 0.0) {
+                if (alpha1[k].re == 0.0) {
+                    D[k + (k << 3)].re = alpha1[k].im / beta1[k].im;
+                    D[k + (k << 3)].im = 0.0;
+                } else if (alpha1[k].im == 0.0) {
+                    D[k + (k << 3)].re = 0.0;
+                    D[k + (k << 3)].im = -(alpha1[k].re / beta1[k].im);
+                } else {
+                    D[k + (k << 3)].re = alpha1[k].im / beta1[k].im;
+                    D[k + (k << 3)].im = -(alpha1[k].re / beta1[k].im);
+                }
+            } else {
+                brm = fabs(beta1[k].re);
+                bim = fabs(beta1[k].im);
+                if (brm > bim) {
+                    brm = beta1[k].im / beta1[k].re;
+                    bim = brm * beta1[k].im + beta1[k].re;
+                    D[k + (k << 3)].re = (brm * alpha1[k].im + alpha1[k].re) / bim;
+                    D[k + (k << 3)].im = (alpha1[k].im - brm * alpha1[k].re) / bim;
+                } else if (bim == brm) {
+                    bim = beta1[k].re > 0.0 ? 0.5 : -0.5;
+                    sgnbi = beta1[k].im > 0.0 ? 0.5 : -0.5;
+                    D[k + (k << 3)].re = (alpha1[k].re * bim + alpha1[k].im * sgnbi) / brm;
+                    D[k + (k << 3)].im = (alpha1[k].im * bim - alpha1[k].re * sgnbi) / brm;
+                } else {
+                    brm = beta1[k].re / beta1[k].im;
+                    bim = brm * beta1[k].re + beta1[k].im;
+                    D[k + (k << 3)].re = (brm * alpha1[k].re + alpha1[k].im) / bim;
+                    D[k + (k << 3)].im = (brm * alpha1[k].im - alpha1[k].re) / bim;
+                }
+            }
+        }
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_eig(\
+%assign comma = ""
+%<comma>const real_T A[64]\
+%assign comma = ", "
+%<comma>creal_T V[64]\
+%assign comma = ", "
+%<comma>creal_T D[64]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 34, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_diag_Fcn35(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+int32_T k;
+for (k = 0; k < 8; k++) {
+    d[k] = v[(k << 3) + k];
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_diag(\
+%assign comma = ""
+%<comma>const creal_T v[64]\
+%assign comma = ", "
+%<comma>creal_T d[8]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 35, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_merge_Fcn36(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+int32_T n;
+int32_T q;
+int32_T iout;
+int32_T n_tmp;
+int32_T exitg1;
+if (!((np == 0) || (nq == 0))) {
+    n_tmp = np + nq;
+    for (q = 0; q < n_tmp; q++) {
+        iout = offset + q;
+        iwork[q] = idx[iout];
+        xwork[q] = x[iout];
+    }
+    n = 0;
+    q = np;
+    iout = offset - 1;
+    do {
+        exitg1 = 0;
+        iout++;
+        if (xwork[n] >= xwork[q]) {
+            idx[iout] = iwork[n];
+            x[iout] = xwork[n];
+            if (n + 1 < np) {
+                n++;
+            } else {
+                exitg1 = 1;
+            }
+        } else {
+            idx[iout] = iwork[q];
+            x[iout] = xwork[q];
+            if (q + 1 < n_tmp) {
+                q++;
+            } else {
+                q = iout - n;
+                while (n + 1 <= np) {
+                    iout = (q + n) + 1;
+                    idx[iout] = iwork[n];
+                    x[iout] = xwork[n];
+                    n++;
+                }
+                exitg1 = 1;
+            }
+        }
+    } while (exitg1 == 0);
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_merge(\
+%assign comma = ""
+%<comma>int32_T idx[8]\
+%assign comma = ", "
+%<comma>real_T x[8]\
+%assign comma = ", "
+%<comma>int32_T offset\
+%assign comma = ", "
+%<comma>int32_T np\
+%assign comma = ", "
+%<comma>int32_T nq\
+%assign comma = ", "
+%<comma>int32_T iwork[8]\
+%assign comma = ", "
+%<comma>real_T xwork[8]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 36, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_sort_Fcn37(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+int32_T iwork[8];
+real_T xwork[8];
+int32_T nNaNs;
+real_T x4[4];
+int8_T idx4[4];
+int32_T ib;
+int32_T m;
+int8_T perm[4];
+int32_T i1;
+int32_T i2;
+int32_T i3;
+int32_T i4;
+%assign _modelSS = ""
+
+%if SLibCG_FcnCallArgAccessed(0,37,2,0)
+%<SLibCG_AccessArg(0 ,37, 1)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,37,2,1)
+%<SLibCG_AccessArg(0 ,37, 0)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,37,1,0)
+%<SLibCG_AccessArg(0 ,37, 1)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,37,1,1)
+%<SLibCG_AccessArg(0 ,37, 0)>
+%endif
+
+%if SLibCG_FcnCallArgAccessed(0,37,0,0)
+%<SLibCG_AccessArg(0 ,37, 1)>
+%endif
+%if SLibCG_FcnCallArgAccessed(0,37,0,1)
+%<SLibCG_AccessArg(0 ,37, 0)>
+%endif
+
+x4[0] = 0.0;
+idx4[0] = 0;
+x4[1] = 0.0;
+idx4[1] = 0;
+x4[2] = 0.0;
+idx4[2] = 0;
+x4[3] = 0.0;
+idx4[3] = 0;
+memset(&xwork[0], 0, sizeof(real_T) << 3U);
+for (m = 0; m < 8; m++) {
+    idx[m] = 0;
+}
+nNaNs = 0;
+ib = 0;
+for (m = 0; m < 8; m++) {
+    if (rtIsNaN(x[m])) {
+        idx[7 - nNaNs] = m + 1;
+        xwork[7 - nNaNs] = x[m];
+        nNaNs++;
+    } else {
+        ib++;
+        idx4[ib - 1] = (int8_T)(m + 1);
+        x4[ib - 1] = x[m];
+        if (ib == 4) {
+            ib = m - nNaNs;
+            if (x4[0] >= x4[1]) {
+                i1 = 1;
+                i2 = 2;
+            } else {
+                i1 = 2;
+                i2 = 1;
+            }
+            if (x4[2] >= x4[3]) {
+                i3 = 3;
+                i4 = 4;
+            } else {
+                i3 = 4;
+                i4 = 3;
+            }
+            if (x4[i1 - 1] >= x4[i3 - 1]) {
+                if (x4[i2 - 1] >= x4[i3 - 1]) {
+                    perm[0] = (int8_T)i1;
+                    perm[1] = (int8_T)i2;
+                    perm[2] = (int8_T)i3;
+                    perm[3] = (int8_T)i4;
+                } else if (x4[i2 - 1] >= x4[i4 - 1]) {
+                    perm[0] = (int8_T)i1;
+                    perm[1] = (int8_T)i3;
+                    perm[2] = (int8_T)i2;
+                    perm[3] = (int8_T)i4;
+                } else {
+                    perm[0] = (int8_T)i1;
+                    perm[1] = (int8_T)i3;
+                    perm[2] = (int8_T)i4;
+                    perm[3] = (int8_T)i2;
+                }
+            } else if (x4[i1 - 1] >= x4[i4 - 1]) {
+                if (x4[i2 - 1] >= x4[i4 - 1]) {
+                    perm[0] = (int8_T)i3;
+                    perm[1] = (int8_T)i1;
+                    perm[2] = (int8_T)i2;
+                    perm[3] = (int8_T)i4;
+                } else {
+                    perm[0] = (int8_T)i3;
+                    perm[1] = (int8_T)i1;
+                    perm[2] = (int8_T)i4;
+                    perm[3] = (int8_T)i2;
+                }
+            } else {
+                perm[0] = (int8_T)i3;
+                perm[1] = (int8_T)i4;
+                perm[2] = (int8_T)i1;
+                perm[3] = (int8_T)i2;
+            }
+            i1 = perm[0] - 1;
+            idx[ib - 3] = idx4[i1];
+            i2 = perm[1] - 1;
+            idx[ib - 2] = idx4[i2];
+            i3 = perm[2] - 1;
+            idx[ib - 1] = idx4[i3];
+            i4 = perm[3] - 1;
+            idx[ib] = idx4[i4];
+            x[ib - 3] = x4[i1];
+            x[ib - 2] = x4[i2];
+            x[ib - 1] = x4[i3];
+            x[ib] = x4[i4];
+            ib = 0;
+        }
+    }
+}
+if (ib > 0) {
+    perm[1] = 0;
+    perm[2] = 0;
+    perm[3] = 0;
+    if (ib == 1) {
+        perm[0] = 1;
+    } else if (ib == 2) {
+        if (x4[0] >= x4[1]) {
+            perm[0] = 1;
+            perm[1] = 2;
+        } else {
+            perm[0] = 2;
+            perm[1] = 1;
+        }
+    } else if (x4[0] >= x4[1]) {
+        if (x4[1] >= x4[2]) {
+            perm[0] = 1;
+            perm[1] = 2;
+            perm[2] = 3;
+        } else if (x4[0] >= x4[2]) {
+            perm[0] = 1;
+            perm[1] = 3;
+            perm[2] = 2;
+        } else {
+            perm[0] = 3;
+            perm[1] = 1;
+            perm[2] = 2;
+        }
+    } else if (x4[0] >= x4[2]) {
+        perm[0] = 2;
+        perm[1] = 1;
+        perm[2] = 3;
+    } else if (x4[1] >= x4[2]) {
+        perm[0] = 2;
+        perm[1] = 3;
+        perm[2] = 1;
+    } else {
+        perm[0] = 3;
+        perm[1] = 2;
+        perm[2] = 1;
+    }
+    for (m = 8; m - 7 <= ib; m++) {
+        i1 = perm[m - 8] - 1;
+        i2 = (m - nNaNs) - ib;
+        idx[i2] = idx4[i1];
+        x[i2] = x4[i1];
+    }
+}
+m = nNaNs >> 1;
+for (ib = 1; ib <= m; ib++) {
+    i2 = (ib - nNaNs) + 7;
+    i1 = idx[i2];
+    idx[i2] = idx[8 - ib];
+    idx[8 - ib] = i1;
+    x[i2] = xwork[8 - ib];
+    x[8 - ib] = xwork[i2];
+}
+if ((nNaNs & 1U) != 0U) {
+    x[(m - nNaNs) + 8] = xwork[(m - nNaNs) + 8];
+}
+for (m = 0; m < 8; m++) {
+    iwork[m] = 0;
+}
+if (8 - nNaNs > 1) {
+    for (m = 0; m < 8; m++) {
+        iwork[m] = 0;
+    }
+    ib = (8 - nNaNs) >> 2;
+    m = 4;
+    while (ib > 1) {
+        if ((ib & 1U) != 0U) {
+            ib--;
+            i1 = m * ib;
+            i2 = 8 - (nNaNs + i1);
+            if (i2 > m) {
+                %<(SLibCGCallSubFcn("mymodel_merge", ["idx", "x", "i1", "m", "i2 - m", "iwork", "xwork"], 0, 37, 1))>;
+            }
+        }
+        i1 = m << 1;
+        ib >>= 1;
+        for (i2 = 1; i2 <= ib; i2++) {
+            %<(SLibCGCallSubFcn("mymodel_merge", ["idx", "x", "(i2 - 1) * i1", "m", "m", "iwork", "xwork"], 0, 37, 2))>;
+        }
+        m = i1;
+    }
+    if (8 - nNaNs > m) {
+        %<(SLibCGCallSubFcn("mymodel_merge", ["idx", "x", "0", "m", "8 - (nNaNs + m)", "iwork", "xwork"], 0, 37, 0))>;
+    }
+}
+if ((nNaNs > 0) && (8 - nNaNs > 0)) {
+    for (m = 8; m - 7 <= nNaNs; m++) {
+        ib = m - nNaNs;
+        xwork[m - 8] = x[ib];
+        iwork[m - 8] = idx[ib];
+    }
+    for (m = 7 - nNaNs; m + 1 > 0; m--) {
+        ib = nNaNs + m;
+        x[ib] = x[m];
+        idx[ib] = idx[m];
+    }
+    for (m = 0; m < nNaNs; m++) {
+        x[m] = xwork[m];
+        idx[m] = iwork[m];
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_sort(\
+%assign comma = ""
+%<comma>real_T x[8]\
+%assign comma = ", "
+%<comma>int32_T idx[8]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 37, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_mrdivide_Fcn38(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+creal_T b_A[16];
+int8_T ipiv[4];
+int32_T j;
+int32_T ix;
+real_T smax;
+int32_T iy;
+int32_T c_ix;
+int32_T d;
+int32_T ijA;
+int32_T jBcol;
+int32_T kBcol;
+real_T s;
+real_T temp_re;
+real_T b_A_im;
+real_T bim;
+memcpy(&b_A[0], &B[0], sizeof(creal_T) << 4U);
+ipiv[0] = 1;
+ipiv[1] = 2;
+ipiv[2] = 3;
+ipiv[3] = 4;
+for (j = 0; j < 3; j++) {
+    jBcol = j * 5;
+    iy = 0;
+    ix = jBcol;
+    smax = fabs(b_A[jBcol].re) + fabs(b_A[jBcol].im);
+    for (kBcol = 2; kBcol <= 4 - j; kBcol++) {
+        ix++;
+        s = fabs(b_A[ix].re) + fabs(b_A[ix].im);
+        if (s > smax) {
+            iy = kBcol - 1;
+            smax = s;
+        }
+    }
+    if ((b_A[jBcol + iy].re != 0.0) || (b_A[jBcol + iy].im != 0.0)) {
+        if (iy != 0) {
+            iy += j;
+            ipiv[j] = (int8_T)(iy + 1);
+            temp_re = b_A[j].re;
+            smax = b_A[j].im;
+            b_A[j] = b_A[iy];
+            b_A[iy].re = temp_re;
+            b_A[iy].im = smax;
+            ix = j + 4;
+            iy += 4;
+            temp_re = b_A[ix].re;
+            smax = b_A[ix].im;
+            b_A[ix] = b_A[iy];
+            b_A[iy].re = temp_re;
+            b_A[iy].im = smax;
+            ix += 4;
+            iy += 4;
+            temp_re = b_A[ix].re;
+            smax = b_A[ix].im;
+            b_A[ix] = b_A[iy];
+            b_A[iy].re = temp_re;
+            b_A[iy].im = smax;
+            ix += 4;
+            iy += 4;
+            temp_re = b_A[ix].re;
+            smax = b_A[ix].im;
+            b_A[ix] = b_A[iy];
+            b_A[iy].re = temp_re;
+            b_A[iy].im = smax;
+        }
+        iy = (jBcol - j) + 4;
+        for (ix = jBcol + 1; ix < iy; ix++) {
+            temp_re = b_A[ix].re;
+            b_A_im = b_A[jBcol].re;
+            if (b_A[jBcol].im == 0.0) {
+                if (b_A[ix].im == 0.0) {
+                    b_A[ix].re /= b_A[jBcol].re;
+                    b_A[ix].im = 0.0;
+                } else if (b_A[ix].re == 0.0) {
+                    b_A[ix].re = 0.0;
+                    b_A[ix].im /= b_A_im;
+                } else {
+                    b_A[ix].re /= b_A[jBcol].re;
+                    b_A[ix].im /= b_A_im;
+                }
+            } else if (b_A[jBcol].re == 0.0) {
+                if (b_A[ix].re == 0.0) {
+                    b_A[ix].re = b_A[ix].im / b_A[jBcol].im;
+                    b_A[ix].im = 0.0;
+                } else if (b_A[ix].im == 0.0) {
+                    b_A[ix].re = 0.0;
+                    b_A[ix].im = -(temp_re / b_A[jBcol].im);
+                } else {
+                    b_A[ix].re = b_A[ix].im / b_A[jBcol].im;
+                    b_A[ix].im = -(temp_re / b_A[jBcol].im);
+                }
+            } else {
+                b_A_im = fabs(b_A[jBcol].re);
+                bim = fabs(b_A[jBcol].im);
+                if (b_A_im > bim) {
+                    s = b_A[jBcol].im / b_A[jBcol].re;
+                    b_A_im = s * b_A[jBcol].im + b_A[jBcol].re;
+                    b_A[ix].re = (s * b_A[ix].im + b_A[ix].re) / b_A_im;
+                    b_A[ix].im = (b_A[ix].im - s * temp_re) / b_A_im;
+                } else if (bim == b_A_im) {
+                    smax = b_A[jBcol].re > 0.0 ? 0.5 : -0.5;
+                    s = b_A[jBcol].im > 0.0 ? 0.5 : -0.5;
+                    b_A[ix].re = (b_A[ix].re * smax + b_A[ix].im * s) / b_A_im;
+                    b_A[ix].im = (b_A[ix].im * smax - temp_re * s) / b_A_im;
+                } else {
+                    s = b_A[jBcol].re / b_A[jBcol].im;
+                    b_A_im = s * b_A[jBcol].re + b_A[jBcol].im;
+                    b_A[ix].re = (s * b_A[ix].re + b_A[ix].im) / b_A_im;
+                    b_A[ix].im = (s * b_A[ix].im - temp_re) / b_A_im;
+                }
+            }
+        }
+    }
+    iy = jBcol;
+    ix = jBcol + 4;
+    for (kBcol = 1; kBcol <= 3 - j; kBcol++) {
+        if ((b_A[ix].re != 0.0) || (b_A[ix].im != 0.0)) {
+            temp_re = -b_A[ix].re - b_A[ix].im * 0.0;
+            smax = b_A[ix].re * 0.0 + -b_A[ix].im;
+            c_ix = jBcol + 1;
+            d = (iy - j) + 8;
+            for (ijA = 5 + iy; ijA < d; ijA++) {
+                b_A_im = b_A[c_ix].re * smax + b_A[c_ix].im * temp_re;
+                b_A[ijA].re += b_A[c_ix].re * temp_re - b_A[c_ix].im * smax;
+                b_A[ijA].im += b_A_im;
+                c_ix++;
+            }
+        }
+        ix += 4;
+        iy += 4;
+    }
+}
+for (j = 0; j < 4; j++) {
+    jBcol = j << 2;
+    iy = j << 2;
+    for (ix = 1; ix <= j; ix++) {
+        kBcol = (ix - 1) << 2;
+        if ((b_A[(ix + iy) - 1].re != 0.0) || (b_A[(ix + iy) - 1].im != 0.0)) {
+            b_A_im = b_A[(ix + iy) - 1].re * A[kBcol].im + b_A[(ix + iy) - 1].im * A[kBcol].re;
+            A[jBcol].re -= b_A[(ix + iy) - 1].re * A[kBcol].re - b_A[(ix + iy) - 1].im * A[kBcol].im;
+            A[jBcol].im -= b_A_im;
+            b_A_im = b_A[(ix + iy) - 1].re * A[1 + kBcol].im + b_A[(ix + iy) - 1].im * A[1 + kBcol].re;
+            A[1 + jBcol].re -= b_A[(ix + iy) - 1].re * A[1 + kBcol].re - b_A[(ix + iy) - 1].im * A[1 + kBcol].im;
+            A[1 + jBcol].im -= b_A_im;
+            b_A_im = b_A[(ix + iy) - 1].re * A[2 + kBcol].im + b_A[(ix + iy) - 1].im * A[2 + kBcol].re;
+            A[2 + jBcol].re -= b_A[(ix + iy) - 1].re * A[2 + kBcol].re - b_A[(ix + iy) - 1].im * A[2 + kBcol].im;
+            A[2 + jBcol].im -= b_A_im;
+            b_A_im = b_A[(ix + iy) - 1].re * A[3 + kBcol].im + b_A[(ix + iy) - 1].im * A[3 + kBcol].re;
+            A[3 + jBcol].re -= b_A[(ix + iy) - 1].re * A[3 + kBcol].re - b_A[(ix + iy) - 1].im * A[3 + kBcol].im;
+            A[3 + jBcol].im -= b_A_im;
+        }
+    }
+    temp_re = b_A[j + iy].re;
+    smax = b_A[j + iy].im;
+    b_A_im = fabs(temp_re);
+    bim = fabs(smax);
+    if (smax == 0.0) {
+        temp_re = 1.0 / temp_re;
+        smax = 0.0;
+    } else if (temp_re == 0.0) {
+        temp_re = 0.0;
+        smax = -1.0 / smax;
+    } else if (b_A_im > bim) {
+        b_A_im = smax / temp_re;
+        smax = b_A_im * smax + temp_re;
+        temp_re = 1.0 / smax;
+        smax = -b_A_im / smax;
+    } else if (b_A_im == bim) {
+        bim = 0.5;
+        if (temp_re < 0.0) {
+            bim = -0.5;
+        }
+        s = 0.5;
+        if (smax < 0.0) {
+            s = -0.5;
+        }
+        temp_re = bim / b_A_im;
+        smax = -s / b_A_im;
+    } else {
+        b_A_im = temp_re / smax;
+        smax += b_A_im * temp_re;
+        temp_re = b_A_im / smax;
+        smax = -1.0 / smax;
+    }
+    b_A_im = A[jBcol].re;
+    s = A[jBcol].im;
+    A[jBcol].re = temp_re * A[jBcol].re - smax * A[jBcol].im;
+    A[jBcol].im = temp_re * s + smax * b_A_im;
+    b_A_im = A[1 + jBcol].re;
+    s = A[1 + jBcol].im;
+    A[1 + jBcol].re = temp_re * b_A_im - smax * s;
+    A[1 + jBcol].im = temp_re * s + smax * b_A_im;
+    b_A_im = A[2 + jBcol].re;
+    s = A[2 + jBcol].im;
+    A[2 + jBcol].re = temp_re * b_A_im - smax * s;
+    A[2 + jBcol].im = temp_re * s + smax * b_A_im;
+    b_A_im = A[3 + jBcol].re;
+    s = A[3 + jBcol].im;
+    A[3 + jBcol].re = temp_re * b_A_im - smax * s;
+    A[3 + jBcol].im = temp_re * s + smax * b_A_im;
+}
+for (j = 3; j >= 0; j--) {
+    jBcol = j << 2;
+    iy = (j << 2) - 1;
+    for (ix = j + 2; ix < 5; ix++) {
+        kBcol = (ix - 1) << 2;
+        if ((b_A[ix + iy].re != 0.0) || (b_A[ix + iy].im != 0.0)) {
+            b_A_im = b_A[ix + iy].re * A[kBcol].im + b_A[ix + iy].im * A[kBcol].re;
+            A[jBcol].re -= b_A[ix + iy].re * A[kBcol].re - b_A[ix + iy].im * A[kBcol].im;
+            A[jBcol].im -= b_A_im;
+            b_A_im = b_A[ix + iy].re * A[1 + kBcol].im + b_A[ix + iy].im * A[1 + kBcol].re;
+            A[1 + jBcol].re -= b_A[ix + iy].re * A[1 + kBcol].re - b_A[ix + iy].im * A[1 + kBcol].im;
+            A[1 + jBcol].im -= b_A_im;
+            b_A_im = b_A[ix + iy].re * A[2 + kBcol].im + b_A[ix + iy].im * A[2 + kBcol].re;
+            A[2 + jBcol].re -= b_A[ix + iy].re * A[2 + kBcol].re - b_A[ix + iy].im * A[2 + kBcol].im;
+            A[2 + jBcol].im -= b_A_im;
+            b_A_im = b_A[ix + iy].re * A[3 + kBcol].im + b_A[ix + iy].im * A[3 + kBcol].re;
+            A[3 + jBcol].re -= b_A[ix + iy].re * A[3 + kBcol].re - b_A[ix + iy].im * A[3 + kBcol].im;
+            A[3 + jBcol].im -= b_A_im;
+        }
+    }
+}
+for (j = 2; j >= 0; j--) {
+    if (j + 1 != ipiv[j]) {
+        jBcol = ipiv[j] - 1;
+        temp_re = A[j << 2].re;
+        smax = A[j << 2].im;
+        A[j << 2] = A[jBcol << 2];
+        A[jBcol << 2].re = temp_re;
+        A[jBcol << 2].im = smax;
+        temp_re = A[(j << 2) + 1].re;
+        smax = A[(j << 2) + 1].im;
+        A[1 + (j << 2)] = A[(jBcol << 2) + 1];
+        A[1 + (jBcol << 2)].re = temp_re;
+        A[1 + (jBcol << 2)].im = smax;
+        temp_re = A[(j << 2) + 2].re;
+        smax = A[(j << 2) + 2].im;
+        A[2 + (j << 2)] = A[(jBcol << 2) + 2];
+        A[2 + (jBcol << 2)].re = temp_re;
+        A[2 + (jBcol << 2)].im = smax;
+        temp_re = A[(j << 2) + 3].re;
+        smax = A[(j << 2) + 3].im;
+        A[3 + (j << 2)] = A[(jBcol << 2) + 3];
+        A[3 + (jBcol << 2)].re = temp_re;
+        A[3 + (jBcol << 2)].im = smax;
+    }
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_mrdivide(\
+%assign comma = ""
+%<comma>creal_T A[16]\
+%assign comma = ", "
+%<comma>const creal_T B[16]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 38, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
+%function mymodel_ARE_diag_Fcn39(block) void
+%assign fcnBuff = ""
+%openfile fcnBuff
+%assign cfgTxt = ""
+%openfile cfgTxt
+creal_T lambda[8];
+real_T ord_lambda[8];
+creal_T T_ord[64];
+creal_T T[64];
+int32_T iidx[8];
+creal_T b[16];
+creal_T T_ord_0[16];
+real_T A_0[64];
+real_T B_0[16];
+int32_T k;
+int32_T i;
+real_T B_1;
+for (k = 0; k < 4; k++) {
+    B_1 = -(B[k] / R);
+    B_0[k] = B_1 * B[0];
+    A_0[k << 3] = A[k << 2];
+    B_0[k + 4] = B_1 * B[1];
+    A_0[1 + (k << 3)] = A[(k << 2) + 1];
+    B_0[k + 8] = B_1 * B[2];
+    A_0[2 + (k << 3)] = A[(k << 2) + 2];
+    B_0[k + 12] = B_1 * B[3];
+    A_0[3 + (k << 3)] = A[(k << 2) + 3];
+}
+for (k = 0; k < 4; k++) {
+    A_0[(k + 4) << 3] = B_0[k << 2];
+    A_0[4 + (k << 3)] = -Q[k << 2];
+    A_0[4 + ((k + 4) << 3)] = -A[k];
+    A_0[1 + ((k + 4) << 3)] = B_0[(k << 2) + 1];
+    A_0[5 + (k << 3)] = -Q[(k << 2) + 1];
+    A_0[5 + ((k + 4) << 3)] = -A[k + 4];
+    A_0[2 + ((k + 4) << 3)] = B_0[(k << 2) + 2];
+    A_0[6 + (k << 3)] = -Q[(k << 2) + 2];
+    A_0[6 + ((k + 4) << 3)] = -A[k + 8];
+    A_0[3 + ((k + 4) << 3)] = B_0[(k << 2) + 3];
+    A_0[7 + (k << 3)] = -Q[(k << 2) + 3];
+    A_0[7 + ((k + 4) << 3)] = -A[k + 12];
+}
+%<(SLibCGCallSubFcn("mymodel_eig", ["A_0", "T", "T_ord"], 0, 39, 2))>;
+%<(SLibCGCallSubFcn("mymodel_diag", ["T_ord", "lambda"], 0, 39, 0))>;
+for (k = 0; k < 8; k++) {
+    ord_lambda[k] = 0.0;
+    if (lambda[k].re < 0.0) {
+        ord_lambda[k] = -1.0;
+    } else {
+        if (lambda[k].re > 0.0) {
+            ord_lambda[k] = 1.0;
+        }
+    }
+}
+%<(SLibCGCallSubFcn("mymodel_sort", ["ord_lambda", "iidx"], 0, 39, 1))>;
+for (k = 0; k < 8; k++) {
+    for (i = 0; i < 8; i++) {
+        T_ord[i + (k << 3)] = T[((iidx[k] - 1) << 3) + i];
+    }
+}
+for (k = 0; k < 4; k++) {
+    b[k << 2] = T_ord[((4 + k) << 3) + 4];
+    T_ord_0[k << 2] = T_ord[(4 + k) << 3];
+    b[1 + (k << 2)] = T_ord[((4 + k) << 3) + 5];
+    T_ord_0[1 + (k << 2)] = T_ord[((4 + k) << 3) + 1];
+    b[2 + (k << 2)] = T_ord[((4 + k) << 3) + 6];
+    T_ord_0[2 + (k << 2)] = T_ord[((4 + k) << 3) + 2];
+    b[3 + (k << 2)] = T_ord[((4 + k) << 3) + 7];
+    T_ord_0[3 + (k << 2)] = T_ord[((4 + k) << 3) + 3];
+}
+%<(SLibCGCallSubFcn("mymodel_mrdivide", ["b", "T_ord_0"], 0, 39, 3))>;
+for (k = 0; k < 16; k++) {
+    P[k] = b[k].re;
+}
+%closefile cfgTxt
+%<cfgTxt>
+%closefile fcnBuff
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void mymodel_ARE_diag(\
+%assign comma = ""
+%<comma>const real_T A[16]\
+%assign comma = ", "
+%<comma>const real_T B[4]\
+%assign comma = ", "
+%<comma>const real_T Q[16]\
+%assign comma = ", "
+%<comma>real_T R\
+%assign comma = ", "
+%<comma>real_T P[16]\
+%assign comma = ", "
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 39, fcnProtoType)>
+%return fcnBuff
+%endfunction
+
