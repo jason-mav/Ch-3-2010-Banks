@@ -1,7 +1,16 @@
 close all;
 clear i j period active_days;
 
-simTime = 60;
+% period = 7;
+% active_days = 1;
+% period_ts = timeseries(period,simTime);
+% if (active_days ~= period )
+%     width_ts = timeseries((active_days-1)/period*100,simTime);
+% else
+%     width_ts = timeseries(period,simTime);
+% end
+
+simTime = 80;
 sim('model_Banks',simTime);
 
 case_sel=Case_out.data(1);
