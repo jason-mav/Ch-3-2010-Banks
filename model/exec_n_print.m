@@ -83,10 +83,14 @@ path = sprintf('figures\\case %d\\[%d-%d]', case_sel, period, active_days);
 fig_cells = figure(1);
 plot(Cells_out.time,Cells_out.data,'LineWidth',1)
 
-title(sprintf('Cell Populations and Drug concentration [%d/%d]', period, active_days),'fontsize',12)
+if period==1 && active_days==1 
+    title(sprintf('Cell Populations and Drug concentration'),'fontsize',12);
+else
+    title(sprintf('Cell Populations and Drug concentration [%d/%d]', period, active_days),'fontsize',12)
+end
 set(gca,'FontSize',11)
 xlabel('Days','fontsize',12)
-ylabel('Cells (10^{11})','fontsize',12)
+ylabel('Cells (10^{11}), Drug(mg/L)','fontsize',12)
 legend('N','T','I','M')
 
 if save == 1 
