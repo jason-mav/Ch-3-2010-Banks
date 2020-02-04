@@ -4,7 +4,7 @@ function plot_results(case_sel, Results)
     path = sprintf('figures\\case %d\\', case_sel);
     
     fig1=figure(1);
-    set(gca,'FontSize',11)
+    set(gca,'FontSize',11)    
     plot(Results(1,:,1),'ro','LineWidth',1)
     hold on;
     plot(Results(2,:,1),'o','LineWidth',1,'color',[0,0,0]) 
@@ -13,7 +13,7 @@ function plot_results(case_sel, Results)
     plot(Results(5,:,1),'o','LineWidth',1,'color',[0.6,0,0])
     plot(Results(7,:,1),'o','LineWidth',1,'color',[0.6,0.6,0])
     plot(Results(10,:,1),'o','LineWidth',1,'color',[0,0.6,0])
-    plot(Results(14,:,1),'o','LineWidth',1,'color',[0,0.5,0.8])
+    plot(Results(14,:,1),'o','LineWidth',1,'color',[0,0.5,0.8])    
     xlabel('Active Days','fontsize',12)
     ylabel('Total Drug (mg/m^2)','fontsize',12)
     % ylim([0 35])
@@ -25,7 +25,7 @@ function plot_results(case_sel, Results)
     print(fig1,'-dpng', strcat(path,'comp_v_total.png'), '-r150');
 
 
-    fig2=figure(2)
+    fig2=figure(2);
     set(gca,'FontSize',11)
     plot(Results(1,:,2),'ro','LineWidth',1)
     hold on;
@@ -64,7 +64,7 @@ function plot_results(case_sel, Results)
 %     ylim([0 180])
     legend('Continuous','2-day period','3-day period','4-day period'...
         ,'5-day period','7-day period','10-day period','14-day period');
-    title('Comparison of treatment duration', 'fontsize', 12)
+    title('Comparison of tumor eradication time', 'fontsize', 12)
     
     saveas(fig3, strcat(path,'comp_t_zero'), 'fig');
     print(fig3,'-dpng', strcat(path,'comp_t_zero.png'), '-r150');
@@ -86,7 +86,7 @@ function plot_results(case_sel, Results)
     % ylim([0 0.8])
     legend('Continuous','2-day period','3-day period','4-day period'...
         ,'5-day period','7-day period','10-day period','14-day period');
-    title('Comparison of minimum normal cells', 'fontsize', 12)
+    title('Comparison of normal cells'' minima', 'fontsize', 12)
     
     saveas(fig4, strcat(path,'comp_N_min'), 'fig');
     print(fig4,'-dpng', strcat(path,'comp_N_min.png'));
