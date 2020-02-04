@@ -1,10 +1,4 @@
-% for i=1:14
-%     for j=1:7
-%         for k=1:5
-%             res(i,j,k)=Results(i,j,k)
-%         end
-%     end
-% end
+
 function plot_results(case_sel, Results)
         
     path = sprintf('figures\\case %d\\', case_sel);
@@ -28,7 +22,7 @@ function plot_results(case_sel, Results)
     title('Comparison of drug dosage', 'fontsize', 12)
     
     saveas(fig1, strcat(path,'comp_v_total'), 'fig');
-    print(fig1,'-dpng', strcat(path,'comp_v_total.png'));
+    print(fig1,'-dpng', strcat(path,'comp_v_total.png'), '-r150');
 
 
     fig2=figure(2)
@@ -67,13 +61,13 @@ function plot_results(case_sel, Results)
     xlabel('Active Days','fontsize',12)
     ylabel('Time (Days)','fontsize',12)
 %     ylim([0 95]) % 
-    ylim([0 180])
+%     ylim([0 180])
     legend('Continuous','2-day period','3-day period','4-day period'...
         ,'5-day period','7-day period','10-day period','14-day period');
     title('Comparison of treatment duration', 'fontsize', 12)
     
     saveas(fig3, strcat(path,'comp_t_zero'), 'fig');
-    print(fig3,'-dpng', strcat(path,'comp_t_zero.png'));
+    print(fig3,'-dpng', strcat(path,'comp_t_zero.png'), '-r150');
 
 
     fig4=figure(4);
