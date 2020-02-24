@@ -15,7 +15,7 @@ if ~(exist('Results','var'))
     Results=NaN(max_period,max_consecutive_days,5);
 end
 
-simTime = 80;
+simTime = 50;
 step = 0.1; % double check simulink
 sim('model_Banks',simTime);
 
@@ -82,16 +82,18 @@ path = sprintf('figures\\case %d\\[%d-%d]', case_sel, period, active_days);
 %%% Cells figure
 fig_cells = figure(1);
 plot(Cells_out.time,Cells_out.data,'LineWidth',1)
+hold on
+stairs(Drug_out.time,Drug_out.data,'k','LineWidth',1,'color',[0.35,0.35,0.35])
 
 if period==1 && active_days==1 
-    title(sprintf('Cell Populations and Drug concentration'),'fontsize',12);
+    title(sprintf('Cell Populations, Drug concentration and Drug input'),'fontsize',12);
 else
-    title(sprintf('Cell Populations and Drug concentration [%d/%d]', period, active_days),'fontsize',12)
+    title(sprintf('Cell Populations, Drug concentration and Drug input [%d/%d]', period, active_days),'fontsize',12)
 end
 set(gca,'FontSize',11)
 xlabel('Days','fontsize',12)
 ylabel('Cells (10^{11}), Drug(mg/L)','fontsize',12)
-legend('N','T','I','M')
+legend('N','T','I','M','v')
 
 if save == 1 
     saveas(fig_cells, path, 'fig');
@@ -117,4 +119,4 @@ if save == 1
     print(fig_drug,'-dpng', strcat(path,'-d.png'));
 end
 
-%     plot_results(case_sel, Results);
+%     plot_periodic_results(case_sel, Results);

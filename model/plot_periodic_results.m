@@ -1,5 +1,5 @@
 
-function plot_results(case_sel, Results)
+function plot_periodic_results(case_sel, Results)
         
     path = sprintf('figures\\case %d\\', case_sel);
     
