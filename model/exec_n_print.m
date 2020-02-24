@@ -1,7 +1,7 @@
 close all;
 clear i j period active_days Cells_out Drug_out;
 
-save = 0;
+save = 1;
 max_period = 14;
 max_consecutive_days = 7; % from the experiments, no more consecutive days are required
 
@@ -15,7 +15,7 @@ if ~(exist('Results','var'))
     Results=NaN(max_period,max_consecutive_days,5);
 end
 
-simTime = 50;
+simTime = 60;
 step = 0.1; % double check simulink
 sim('model_Banks',simTime);
 
@@ -81,9 +81,15 @@ Results(period,active_days,5) = Tmax;
 path = sprintf('figures\\case %d\\[%d-%d]', case_sel, period, active_days);
 %%% Cells figure
 fig_cells = figure(1);
-plot(Cells_out.time,Cells_out.data,'LineWidth',1)
+% plot(Cells_out.time,Cells_out.data,'LineWidth',1)
+if period==1 && active_days==1 
+    stairs(Drug_out.time,Drug_out.data,'k','LineWidth',1,'color',[0.35,0.35,0.35])
+else
+    stairs(Drug_out.time,Drug_out.data,'k','LineWidth',1,'color',[0.4,0.4,0.4])
+end
 hold on
-stairs(Drug_out.time,Drug_out.data,'k','LineWidth',1,'color',[0.35,0.35,0.35])
+plot(Cells_out.time,Cells_out.data,'LineWidth',1)
+
 
 if period==1 && active_days==1 
     title(sprintf('Cell Populations, Drug concentration and Drug input'),'fontsize',12);
@@ -92,7 +98,7 @@ else
 end
 set(gca,'FontSize',11)
 xlabel('Days','fontsize',12)
-ylabel('Cells (10^{11}), Drug(mg/L)','fontsize',12)
+ylabel('Cells (10^{11}), Drug conc.(mg/L), Drug input(mg/m^2)','fontsize',12)
 legend('N','T','I','M','v')
 
 if save == 1 
@@ -111,7 +117,7 @@ set(gca,'FontSize',11)
 xlabel('Days','fontsize',12)
 ylabel('Drug (mg/m^2)','fontsize',12)
 if (case_sel == 4)
-    ylim([0 1.2])
+    ylim([0 1.8])
 end
 
 if save == 1
